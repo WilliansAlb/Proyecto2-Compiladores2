@@ -1,7 +1,7 @@
 <br />
 <p align="center">
-  <a href="https://github.com/WilliansAlb/Proyecto2-Compiladores2/tree/master/Frontend/GeneradorCodigoIntermedio/src/assets/img/program.png">
-    <img src="https://github.com/WilliansAlb/Proyecto2-Compiladores2/tree/master/Frontend/GeneradorCodigoIntermedio/src/assets/img/program.png" alt="Logo" width="80" height="80">
+  <a href="https://github.com/WilliansAlb/Proyecto2-Compiladores2/blob/master/Frontend/GeneradorCodigoIntermedio/src/assets/img/program.png">
+    <img src="https://github.com/WilliansAlb/Proyecto2-Compiladores2/blob/master/Frontend/GeneradorCodigoIntermedio/src/assets/img/program.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Generador de codigo intermedio</h3>
