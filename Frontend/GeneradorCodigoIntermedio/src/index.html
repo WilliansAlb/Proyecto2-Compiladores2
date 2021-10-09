@@ -1,13 +1,223 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>GeneradorCodigoIntermedio</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/x-icon" href="assets/img/program.png">
+  <link rel="stylesheet" href="app/app.component.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: 'Fira Code', monospace;
+    }
+
+    body {
+      background-color: #202124;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    nav {
+      height: 50px;
+      position: sticky;
+      background-color: #303134;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      justify-content: space-evenly;
+      align-items: center;
+      align-content: center;
+    }
+
+    #menu {
+      height: fit-content;
+      position: sticky;
+      background-color: #464749;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: 5px;
+      align-items: center;
+      align-content: center;
+    }
+
+    #menu button {
+      border: 1px solid transparent;
+      color: yellow;
+      background: none;
+      padding: 5px;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    #menu button:hover {
+      border: 1px solid white;
+      color: black;
+      background-color: white;
+      cursor: pointer;
+    }
+
+    #pestaña {
+      position: fixed;
+      left: 0;
+      height: 100%;
+      width: 70px;
+      display: flex;
+      background-color: #303134;
+      flex-direction: column;
+      align-content: center;
+      align-items: center;
+    }
+
+    .pestañas {
+      filter: invert(36%) sepia(6%) saturate(4%) hue-rotate(335deg) brightness(97%) contrast(84%);
+    }
+
+    .pestañas:hover:hover {
+      filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(146deg) brightness(110%) contrast(101%);
+    }
+
+    .seleccionado {
+      filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(146deg) brightness(110%) contrast(101%);
+    }
+
+    .pestañas:hover {
+      cursor: pointer;
+    }
+
+    .contenedor-img {
+      border-left: 5px solid transparent;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      justify-items: center;
+      align-items: center;
+      padding-bottom: 0.5em;
+      padding-top: 0.5em;
+    }
+
+    .seleccionado-contenedor {
+      border-left: 5px solid white;
+    }
+    .dropbtn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+.dropdown:hover .dropbtn {background-color: #3e8e41;}
+  </style>
 </head>
+
 <body>
-  <app-root></app-root>
+  <nav>
+    <img src="assets/img/program.png" width="40px">
+  </nav>
+  <div id="menu">
+    <div class="dropdown">
+      <button class="dropbtn">Archivo</button>
+      <div class="dropdown-content">
+        <a href="#">Nuevo archivo</a>
+        <a href="#">Abrir proyecto</a>
+        <a href="#">Abrir archivo</a>
+        <a href="#">Guardar</a>
+        <a href="#">Guardar como</a>
+        <a href="#">Cerrar proyecto</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button class="dropbtn">Generar</button>
+      <div class="dropdown-content">
+        <a href="#">Código en tres direcciones</a>
+        <a href="#">Código optimizado</a>
+        <a href="#">Código assembler</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button class="dropbtn">Descargar</button>
+      <div class="dropdown-content">
+        <a href="#">Código en tres direcciones</a>
+        <a href="#">Código optimizado</a>
+        <a href="#">Código assembler</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button class="dropbtn">Reporte</button>
+      <div class="dropdown-content">
+        <a href="#">Ver reporte</a>
+      </div>
+    </div>
+  </div>
+  <div id="pestaña">
+    <div class="contenedor-img seleccionado-contenedor">
+      <img src="assets/img/codearea.png" width="40px" height="40px" id="codearea" class="pestañas seleccionado"
+        onclick="imgClick(this)">
+    </div>
+    <div class="contenedor-img">
+      <img src="assets/img/c.png" width="40px" height="40px" id="c" class="pestañas" onclick="imgClick(this)">
+    </div>
+    <div class="contenedor-img">
+      <img src="assets/img/cop.png" width="40px" height="40px" id="cop" class="pestañas" onclick="imgClick(this)">
+    </div>
+    <div class="contenedor-img">
+      <img src="assets/img/asm.png" width="40px" height="40px" id="asm" class="pestañas" onclick="imgClick(this)">
+    </div>
+    <div class="contenedor-img">
+      <img src="assets/img/reporte2.png" width="40px" height="40px" id="asm" class="pestañas" onclick="imgClick(this)">
+    </div>
+    <div class="contenedor-img">
+      <img src="assets/img/reporte.png" width="40px" height="40px" id="errores" class="pestañas"
+        onclick="imgClick(this)">
+    </div>
+  </div>
+  <script>
+    function imgClick(boton) {
+      var imagenes = document.querySelectorAll(".pestañas");
+      for (let i = 0; i < imagenes.length; i++) {
+        imagenes[i].classList.remove("seleccionado");
+        var divs = imagenes[i].parentNode;
+        divs.classList.remove("seleccionado-contenedor");
+      }
+      boton.classList.add("seleccionado");
+      boton.parentNode.classList.add("seleccionado-contenedor");
+    }
+  </script>
 </body>
+
 </html>

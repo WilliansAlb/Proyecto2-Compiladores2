@@ -1,0 +1,49 @@
+int i,j,a[10][5];
+for (i = 0; i < 10; i++) {
+	for (j = 0; j < 4; j++) {
+		a[i][j] = a[i][j + 1] * 2;
+	}
+	a[1][4] = 0;
+}
+
+if (i + j == 5) {
+	a[i + 1] = a[j] * 5;
+} else {
+	a[j + 1] = j + 1 * 5;
+}
+
+bloques////
+
+int i;
+int j;
+int a[10][5];
+i = 0;
+et1:
+	if (i >= 10) goto et2:
+	j = 0;
+	et3:
+		if (j >= 4) goto et5:
+		t1 = j + 1;
+		t2 = i;
+		t3 = a[t2][t1]
+		t4 = t3*2;
+		
+		a[i][j] = t4;
+		j = j + 1;
+		goto et3;
+	et5:
+	a[1][4] = 0;
+	i = i + 1;
+	goto et1;
+et2:
+t5 = i + j;
+if (t5 != 5) goto et6
+t6 = a[j];
+t7 = t6 * 5;
+t8 = i + 1;
+a[t8] = t7;
+et6:
+t9 = 1 * 5;
+t10 = j + t9;
+t11 = j + 1;
+a[t11] = t10;

@@ -1,14 +1,12 @@
 %{ var indents = [0], indent = 0, indent_actual = 0, dedents = 0, val_actual = "" %}
 %lex
-
 reserved                                {keywords}|{operators}
 keywords                                "continue"|"finally"|"return"|"global"|
                                         "assert"|"except"|"import"|"lambda"|
                                         "raise"|"class"|"print"|"break"|"while"|
                                         "yield"|"from"|"elif"|"else"|"with"|
                                         "pass"|"exec"|"and"|"del"|"not"|"def"|
-                                        "for"|"try"|"as"|"or"|"if"|"input"|"in"|"is"|"range"
-
+                                        "for"|"try"|"as"|"or"|"if"|"input"|"in"|"is"|"range"|"true"|"false"
 reservadas                              "public" | "private" | "class" | "extends" | "intinput" | "floatinput" | "charinput" | "int" |
                                         "String" | "char" | "float" | "boolean" | "true" | "false" |
                                         "else" | "while" | "for" | "do" | "break" | "continue" |
@@ -62,33 +60,33 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 <PYTHON>{apertura_java}                 %{ this.begin("JAVA"); return 'JAVA' %}
 <PYTHON>'if'                              %{ return 'IF'; %}
 <PYTHON>'else'                            %{ return 'ELSE'; %}
-<PYTHON>'elif'                            %{ return 'ELIF'; %}
-<PYTHON>'+='                               %{ return 'MAS_ASIGNAR'; %}
-<PYTHON>'++'                               %{ return 'MAS'; %}
-<PYTHON>'--'                               %{ return 'MENOS'; %}
-<PYTHON>'+'                               %{ return 'SUMA'; %}
-<PYTHON>'-'                               %{ return 'RESTA'; %}
-<PYTHON>'*'                               %{ return 'POR'; %}
-<PYTHON>'/'                               %{ return 'ENTRE'; %}
-<PYTHON>'^'                               %{ return 'POT'; %}
-<PYTHON>'&&'                               %{ return 'AND'; %}
-<PYTHON>'||'                               %{ return 'OR'; %}
-<PYTHON>'!'                               %{ return 'NOT'; %}
-<PYTHON>'='                               %{ return 'ASIGNAR'; %}
-<PYTHON>'=='                               %{ return 'IGUAL_IGUAL'; %}
-<PYTHON>'!='                               %{ return 'DIFERENTE'; %}
-<PYTHON>'>'                               %{ return 'MAYOR'; %}
-<PYTHON>'>='                               %{ return 'MAYOR_IGUAL'; %}
-<PYTHON>'<'                               %{ return 'MENOR'; %}
-<PYTHON>'<='                               %{ return 'MENOR_IGUAL'; %}
+<PYTHON>'elif'                          %{ return 'ELIF'; %}
+<PYTHON>'+='                            %{ return 'MAS_ASIGNAR'; %}
+<PYTHON>'++'                            %{ return 'MAS'; %}
+<PYTHON>'--'                            %{ return 'MENOS'; %}
+<PYTHON>'+'                             %{ return 'SUMA'; %}
+<PYTHON>'-'                             %{ return 'RESTA'; %}
+<PYTHON>'*'                             %{ return 'POR'; %}
+<PYTHON>'/'                             %{ return 'ENTRE'; %}
+<PYTHON>'^'                             %{ return 'POT'; %}
+<PYTHON>'&&'                            %{ return 'AND'; %}
+<PYTHON>'||'                            %{ return 'OR'; %}
+<PYTHON>'!'                             %{ return 'NOT'; %}
+<PYTHON>'='                             %{ return 'ASIGNAR'; %}
+<PYTHON>'=='                            %{ return 'IGUAL_IGUAL'; %}
+<PYTHON>'!='                            %{ return 'DIFERENTE'; %}
+<PYTHON>'>'                             %{ return 'MAYOR'; %}
+<PYTHON>'>='                            %{ return 'MAYOR_IGUAL'; %}
+<PYTHON>'<'                             %{ return 'MENOR'; %}
+<PYTHON>'<='                            %{ return 'MENOR_IGUAL'; %}
 <PYTHON>{reserved}                      %{ return yytext; %}
 <PYTHON>{digit}                         %{ return 'INT'; %}
 <PYTHON>{float}                         %{ return 'FLOAT'; %}
-<PYTHON>{shortstring_double}                   %{ return 'STRING'; %}
-<PYTHON>{shortstring_single}                   %{ return 'CHAR'; %}
+<PYTHON>{shortstring_double}            %{ return 'STRING'; %}
+<PYTHON>{shortstring_single}            %{ return 'CHAR'; %}
 <PYTHON>{identifier}                    %{ return 'IDENTIFICADOR'; %}
-<INDENT>\t                               %{ indent_actual += 1; %}
-<INDENT>\t                               %{ indent_actual += 1; %}
+<INDENT>\t                              %{ indent_actual += 1; %}
+<INDENT>' '                             %{ /* espacios en blanco */ %}
 <INDENT>(\r?\n)+                     	%{ indent_actual = 0; %}
 <INDENT>.                               %{ 
                                             var posible = indent - indent_actual;
@@ -113,7 +111,7 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
                                                 return 'INDENT';
                                             } 
                                         %}
-<DEDENT>.                              %{
+<DEDENT>.                               %{
                                             this.unput(yytext);
                                             if (dedents!=0){
                                                 dedents--;
@@ -155,6 +153,10 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 <<EOF>>                        %{ return 'EOF'; %}
 
 /lex
+
+%{
+	const TIPO_DATO			= require('./tabla_simbolos').TIPO_DATO; 
+%}
 
 /* operator associations and precedence */
 %left MAS MENOS
@@ -230,7 +232,7 @@ sentencia_java:
     | switch_java
     | 'continue' ';'
     | 'break' ';'
-    | 'return' expr ';'
+    | 'return' expresion_java ';'
         {console.log("Retorna "+$2);}
     | imprimir_java
         {console.log("Imprime");}
@@ -242,8 +244,8 @@ imprimir_java:
 ;
 
 lista_imprimir_java:
-    lista_imprimir_java ',' expr
-    | expr
+    lista_imprimir_java ',' expresion_java
+    | expresion_java
 ;
 
 switch_java:
@@ -269,9 +271,9 @@ declaracion_java:
 ;
 
 asignacion_java:
-    IDENTIFICADOR ASIGNAR expr ';'
+    IDENTIFICADOR ASIGNAR expresion_java ';'
         {console.log("Asignacion normal");}
-    | IDENTIFICADOR MAS_ASIGNAR expr ';'
+    | IDENTIFICADOR MAS_ASIGNAR expresion_java ';'
         {console.log("Asignacion incremencial");}
     | IDENTIFICADOR MAS ';'
         {console.log("Asignacion ++");}
@@ -287,7 +289,7 @@ tipo_input_java:
 ;
 
 declaracion_cola_java:
-    | ASIGNAR expr
+    | ASIGNAR expresion_java
 ;
 
 valor_java:
@@ -297,24 +299,24 @@ valor_java:
 ;
 
 if_java:
-    IF '(' expr ')' '{' listado_java '}'
+    IF '(' expresion_java ')' '{' listado_java '}'
         {console.log("encuentra if");}
-    | IF '(' expr ')' '{' listado_java '}' ELSE '{' listado_java '}'
+    | IF '(' expresion_java ')' '{' listado_java '}' ELSE '{' listado_java '}'
         {console.log("encuentra if-else");}
-    | IF '(' expr ')' '{' listado_java '}' ELSE if_java
+    | IF '(' expresion_java ')' '{' listado_java '}' ELSE if_java
         {console.log("encuentra if-elseif");}
 ;
 
 for_java:
-    'for' '(' declaracion_for ';' expr ';' accion_posterior_java ')' '{' listado_java '}'
+    'for' '(' declaracion_for ';' expresion_java ';' accion_posterior_java ')' '{' listado_java '}'
 ;
 
 while_java:
-    'while' '(' expr ')' '{' listado_java '}'
+    'while' '(' expresion_java ')' '{' listado_java '}'
 ;
 
 do_while_java:
-    'do' '{' listado_java '}' 'while' '(' expr ')' ';'
+    'do' '{' listado_java '}' 'while' '(' expresion_java ')' ';'
 ;
 
 declaracion_for:
@@ -362,30 +364,34 @@ herencia:
 ;
 
 
-expr:
-    expr SUMA expr
-    | expr POR expr
-    | expr ENTRE expr
-    | expr POT expr
-    | expr RESTA expr
-    | RESTA expr
+expresion_java:
+    expresion_java SUMA expresion_java
+    | expresion_java POR expresion_java
+    | expresion_java ENTRE expresion_java
+    | expresion_java POT expresion_java
+    | expresion_java RESTA expresion_java
+    | RESTA expresion_java
     %prec UMINUS
-    | expr AND expr
-    | expr OR expr
-    | NOT expr
-    | expr IGUAL_IGUAL expr
-    | expr DIFERENTE expr
-    | expr MAYOR expr
-    | expr MAYOR_IGUAL expr
-    | expr MENOR expr
-    | expr MENOR_IGUAL
-    | '(' expr ')'
+    | expresion_java AND expresion_java
+    | expresion_java OR expresion_java
+    | NOT expresion_java
+    | expresion_java IGUAL_IGUAL expresion_java
+    | expresion_java DIFERENTE expresion_java
+    | expresion_java MAYOR expresion_java
+    | expresion_java MAYOR_IGUAL expresion_java
+    | expresion_java MENOR expresion_java
+    | expresion_java MENOR_IGUAL expresion_java
+    | '(' expresion_java ')'
     | IDENTIFICADOR
     | INT
     | STRING
     | FLOAT
     | CHAR
     | IDENTIFICADOR '(' ')'
+    | 'true'
+        { $$ = true; }
+    | 'false'
+        { $$ = false; }
 ;
 
 codigo_python:
@@ -425,7 +431,7 @@ sentencias_pythonp:
 ;
 
 sentencia_python:
-    asignar
+    asignacion_python
     |   if_python
     |   for_python
     |   print_python
@@ -433,12 +439,18 @@ sentencia_python:
 ;
 
 print_python:
-    'print' '(' lista_imprimir_java ')' SALTO
-    |   'println' '(' lista_imprimir_java ')' SALTO
+    'print' '(' lista_imprimir_python ')' SALTO
+    |   'println' '(' lista_imprimir_python ')' SALTO
 ;
 
-asignar:
-    IDENTIFICADOR ASIGNAR valor SALTO
+
+lista_imprimir_python:
+    lista_imprimir_python ',' expresion_python
+    | expresion_python
+;
+
+asignacion_python:
+    IDENTIFICADOR ASIGNAR expresion_python SALTO
 		{console.log("una asignacion");}
     |   IDENTIFICADOR ASIGNAR 'input' '(' ')' SALTO
         {console.log("input");}
@@ -458,13 +470,13 @@ for_python:
 ;
 
 while_python:
-    'while' expr ':' SALTO INDENT sentencias_python DEDENT
+    'while' expresion_python ':' SALTO INDENT sentencias_python DEDENT
         {console.log("Encuentra while");}
 ;
 
 if_python
-    : IF expr ':' SALTO INDENT sentencias_python DEDENT               { console.log("if"); }
-    | IF expr ':' SALTO INDENT sentencias_python DEDENT if_python_cola  { console.log("if-cola"); }
+    : IF expresion_python ':' SALTO INDENT sentencias_python DEDENT               { console.log("if"); }
+    | IF expresion_python ':' SALTO INDENT sentencias_python DEDENT if_python_cola  { console.log("if-cola"); }
     ;
 if_python_cola
     : ELSE ':' SALTO INDENT sentencias_python DEDENT                  { console.log("if-else"); }
@@ -472,6 +484,40 @@ if_python_cola
     | elif_python                                           { console.log("if-elif"); }
     ;
 elif_python
-    : ELIF expr ':' SALTO INDENT sentencias_python DEDENT            { console.log("elif"); }
-    | ELIF expr ':' SALTO INDENT sentencias_python DEDENT elif_python    { console.log("elif-elif"); }
+    : ELIF expresion_python ':' SALTO INDENT sentencias_python DEDENT            { console.log("elif"); }
+    | ELIF expresion_python ':' SALTO INDENT sentencias_python DEDENT elif_python    { console.log("elif-elif"); }
     ;
+
+expresion_python:
+    expresion_python SUMA expresion_python
+    | expresion_python POR expresion_python
+    | expresion_python ENTRE expresion_python
+    | expresion_python POT expresion_python
+    | expresion_python RESTA expresion_python
+    | RESTA expresion_python
+    %prec UMINUS
+    | expresion_python AND expresion_python
+    | expresion_python OR expresion_python
+    | NOT expresion_python
+    | expresion_python IGUAL_IGUAL expresion_python
+    | expresion_python DIFERENTE expresion_python
+    | expresion_python MAYOR expresion_python
+    | expresion_python MAYOR_IGUAL expresion_python
+    | expresion_python MENOR expresion_python
+    | expresion_python MENOR_IGUAL expresion_python
+    | '(' expresion_python ')'
+        { $$ = $2; }
+    | IDENTIFICADOR
+    | INT
+        { $$ = $1; }
+    | STRING
+        { $$ = $1; }
+    | FLOAT
+        { $$ = $1; }
+    | CHAR
+        { $$ = $1; }
+    | 'true'
+        { $$ = true; }
+    | 'false'
+        { $$ = false; }
+;

@@ -19,7 +19,7 @@ def otraFuncion():
 			print("hola")
 %%JAVA
 public class hola extends adios{
-	public int numero12;
+	public int numero1;
 	public hola(int hola2){
 
 	}
