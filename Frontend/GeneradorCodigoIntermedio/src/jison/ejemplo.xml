@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proyecto nombre="proyecto1">
+	<folder nombre="folder">
+		<archivo>Everyday Italian</archivo>
+		<archivo>Giada De Laurentiis</archivo>
+		<folder nombre="folder">
+			<archivo>Harry Potter</archivo>
+			<archivo>J K. Rowling</archivo>
+			<folder nombre="folder">
+				<archivo>Harry Potter</archivo>
+				<archivo>J K. Rowling</archivo>
+			</folder>
+			<folder nombre="folder">
+				<archivo>Learning XML</archivo>
+				<archivo>Erik T. Ray</archivo>
+			</folder>
+		</folder>
+		<folder nombre="folder">
+			<archivo>Learning XML</archivo>
+			<archivo>Erik T. Ray</archivo>
+		</folder>
+	</folder>
+	<folder nombre="folder">
+		<archivo>Harry Potter</archivo>
+		<archivo>J K. Rowling</archivo>
+	</folder>
+	<folder nombre="folder">
+		<archivo>Learning XML</archivo>
+		<archivo>Erik T. Ray</archivo>
+	</folder>
+</proyecto>

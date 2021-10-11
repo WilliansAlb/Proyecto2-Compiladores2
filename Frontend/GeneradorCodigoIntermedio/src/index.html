@@ -3,145 +3,12 @@
 
 <head>
   <meta charset="utf-8">
-  <title>GeneradorCodigoIntermedio</title>
+  <title>Generador</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="assets/img/program.png">
-  <link rel="stylesheet" href="app/app.component.css">
+  <link rel="stylesheet" href="assets/css/index.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
-
-    * {
-      margin: 0;
-      padding: 0;
-      font-family: 'Fira Code', monospace;
-    }
-
-    body {
-      background-color: #202124;
-      width: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    nav {
-      height: 50px;
-      position: sticky;
-      background-color: #303134;
-      display: flex;
-      flex-wrap: nowrap;
-      flex-direction: row;
-      justify-content: space-evenly;
-      align-items: center;
-      align-content: center;
-    }
-
-    #menu {
-      height: fit-content;
-      position: sticky;
-      background-color: #464749;
-      display: flex;
-      flex-wrap: nowrap;
-      flex-direction: row;
-      justify-content: center;
-      flex-wrap: 5px;
-      align-items: center;
-      align-content: center;
-    }
-
-    #menu button {
-      border: 1px solid transparent;
-      color: yellow;
-      background: none;
-      padding: 5px;
-      font-weight: bold;
-      font-size: 1.1rem;
-    }
-
-    #menu button:hover {
-      border: 1px solid white;
-      color: black;
-      background-color: white;
-      cursor: pointer;
-    }
-
-    #pestaña {
-      position: fixed;
-      left: 0;
-      height: 100%;
-      width: 70px;
-      display: flex;
-      background-color: #303134;
-      flex-direction: column;
-      align-content: center;
-      align-items: center;
-    }
-
-    .pestañas {
-      filter: invert(36%) sepia(6%) saturate(4%) hue-rotate(335deg) brightness(97%) contrast(84%);
-    }
-
-    .pestañas:hover:hover {
-      filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(146deg) brightness(110%) contrast(101%);
-    }
-
-    .seleccionado {
-      filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(146deg) brightness(110%) contrast(101%);
-    }
-
-    .pestañas:hover {
-      cursor: pointer;
-    }
-
-    .contenedor-img {
-      border-left: 5px solid transparent;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      justify-items: center;
-      align-items: center;
-      padding-bottom: 0.5em;
-      padding-top: 0.5em;
-    }
-
-    .seleccionado-contenedor {
-      border-left: 5px solid white;
-    }
-    .dropbtn {
-  background-color: #04AA6D;
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  border: none;
-}
-
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.dropdown-content a:hover {background-color: #ddd;}
-
-.dropdown:hover .dropdown-content {display: block;}
-
-.dropdown:hover .dropbtn {background-color: #3e8e41;}
   </style>
 </head>
 
@@ -184,26 +51,73 @@
       </div>
     </div>
   </div>
-  <div id="pestaña">
-    <div class="contenedor-img seleccionado-contenedor">
-      <img src="assets/img/codearea.png" width="40px" height="40px" id="codearea" class="pestañas seleccionado"
-        onclick="imgClick(this)">
+  <div id="cuerpo">
+    <div id="pestaña">
+      <div class="contenedor-img seleccionado-contenedor">
+        <img src="assets/img/codearea.png" title="Editor de codigo" width="40px" id="codearea"
+          class="pestañas seleccionado" onclick="imgClick(this)">
+      </div>
+      <div class="contenedor-img">
+        <img src="assets/img/c.png" title="Codigo tres direcciones C" width="40px" id="c" class="pestañas"
+          onclick="imgClick(this)">
+      </div>
+      <div class="contenedor-img">
+        <img src="assets/img/cop.png" title="Codigo optimizado C" width="40px" id="cop" class="pestañas"
+          onclick="imgClick(this)">
+      </div>
+      <div class="contenedor-img">
+        <img src="assets/img/asm.png" title="Codigo optimizado Assembler" width="40px" id="asm" class="pestañas"
+          onclick="imgClick(this)">
+      </div>
+      <div class="contenedor-img">
+        <img src="assets/img/reporte2.png" title="Reportes" width="40px" id="asm" class="pestañas"
+          onclick="imgClick(this)">
+      </div>
+      <div class="contenedor-img">
+        <img src="assets/img/reporte.png" title="Errores" width="40px" id="errores" class="pestañas"
+          onclick="imgClick(this)">
+      </div>
     </div>
-    <div class="contenedor-img">
-      <img src="assets/img/c.png" width="40px" height="40px" id="c" class="pestañas" onclick="imgClick(this)">
-    </div>
-    <div class="contenedor-img">
-      <img src="assets/img/cop.png" width="40px" height="40px" id="cop" class="pestañas" onclick="imgClick(this)">
-    </div>
-    <div class="contenedor-img">
-      <img src="assets/img/asm.png" width="40px" height="40px" id="asm" class="pestañas" onclick="imgClick(this)">
-    </div>
-    <div class="contenedor-img">
-      <img src="assets/img/reporte2.png" width="40px" height="40px" id="asm" class="pestañas" onclick="imgClick(this)">
-    </div>
-    <div class="contenedor-img">
-      <img src="assets/img/reporte.png" width="40px" height="40px" id="errores" class="pestañas"
-        onclick="imgClick(this)">
+    <div id="area-editor">
+      <div id="arbol">
+        <div class="contenedor-img">
+          <span>PROYECTO</span>
+          <img src="assets/img/abrir.png" title="Abrir" width="20px" id="abrir" style="margin-left: 1em;">
+          <img src="assets/img/cerrar.png" title="Cerrar" width="20px" id="cerrar" style="margin-left: 1em;">
+        </div>
+        <hr>
+        <div id="contenedor-arbol">
+          <ul>
+            <li><span class="caret"><img width="15em" src="assets/img/folder-cerrado.png" class="folder" title="Paquete">Paquete</span><img width="15em" class="nuevo-archivo" onclick="nuevo_archivo(this)" title="Nuevo archivo">
+              <ul class="nested">
+                <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
+                <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
+                <li><span class="caret"><img width="15em" src="assets/img/folder-cerrado.png" class="folder" title="Paquete">Paquete</span><img width="15em" class="nuevo-archivo" onclick="nuevo_archivo(this)" title="Nuevo archivo">
+                  <ul class="nested">
+                    <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
+                    <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
+                    <li><span class="caret"><img width="15em" src="assets/img/folder-cerrado.png" class="folder" title="Paquete">Paquete</span><img width="15em" class="nuevo-archivo" onclick="nuevo_archivo(this)" title="Nuevo archivo">
+                      <ul class="nested">
+                        <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
+                        <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div id="textarea-object">
+        <div id="menu-archivo">
+          <span id="nombre-archivo">sin-titulo.mgl<img src="assets/img/cerrar2.png" title="Cerrar" width="12em" id="cerrar-archivo"></span>
+          <img src="assets/img/guardar.png" alt="Guardar" width="21em" height="21em" title="Guardar">
+          <img src="assets/img/guardar-como.png" alt="Guardar-como" width="25em" height="25em" title="Guardar como">
+        </div>
+        <div id="textarea"></div>
+        <div id="visor">Linea: 0 Columna: 0</div>
+      </div>
     </div>
   </div>
   <script>
@@ -218,6 +132,10 @@
       boton.parentNode.classList.add("seleccionado-contenedor");
     }
   </script>
+  <script src="assets/scripts/textarea.js"></script>
+  <div id="oculto">
+
+  </div>
 </body>
 
 </html>
