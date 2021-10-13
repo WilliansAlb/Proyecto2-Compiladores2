@@ -1,1 +1,62 @@
-%%PYTHON	1
+%%PYTHON
+def unafuncion(nombre,nombre2):
+	x1 = 10
+	x2 = 20
+def otraFuncion():
+	se1 = 20
+	if 5 > 20:
+		se2 = 30
+	elif 5 < 10:
+		if a > ab:
+			se5 = 60
+	else:
+		se4 = 50
+	for x in range ():
+		se6 = 70
+		print("ingresa un numero a sumar para la casilla #",10)
+		se7 = input()
+		while a < 23:
+			print("hola")
+%%JAVA
+public class hola extends adios{
+	public int numero1;
+	public hola(int hola2){
+
+	}
+	private void numeros(){
+		String numero2 = "estoy probando nomas";
+		if (7>5)
+		{
+			int numero3 = "estoy probando nomas";
+			int numero2 = intinput();
+		} else if (10>11) {
+			boolean bool = "otra prueba mas";
+		} else {
+			int numeral = 'A';
+		}
+		for (int aleatorio = 1; aleatorio < 10; aleatorio++){
+			int numero4 = "$";
+		}
+		while (a>20){
+			int conteo = "no se que pedo";
+		}
+		do {
+			int conteo2 = 0.234;
+			conteo2 += 29+320;
+			conteo2 = 30;
+			conteo2++;
+			conteo2--;
+		} while ( 5>a32);
+		switch(prueba){
+			case 'C':
+				conteo++;
+			case 2:
+				conteo--;
+		}
+		println(,listado,20,23.2);
+		print('conteo',listado,20,23.2);
+		return "algo";
+	}
+}
+%%PROGRAMA
+asdfa

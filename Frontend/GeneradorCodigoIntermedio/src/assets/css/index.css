@@ -191,9 +191,6 @@ ul, #myUL {
 
 /* Rotate the caret/arrow icon when clicked on (using JavaScript) */
 
-.caret-down::before {
-	/*transform: rotate(90deg);*/
-}
 
 /* Hide the nested list */
 
@@ -228,10 +225,12 @@ textarea:focus-visible {
 	grid-template-columns: 100%;
 	grid-template-rows: 5% 95% 5%;
 	width: 100%;
-	height: 85%;
+	height: 83%;
 }
 
 #visor {
+	padding: 0.3em;
+	padding-right: 1em;
 	text-align: end;
 	color: #ffa;
 	border-top-style: solid;
@@ -345,4 +344,44 @@ textarea:focus-visible {
 
 #contenedor-arbol{
 	overflow: visible;
+}
+
+#vacio-proyecto{
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    height: 80%;
+}
+
+#vacio-proyecto img{
+	width: 40%;
+	filter: invert(99%) sepia(64%) saturate(1044%) hue-rotate(326deg) brightness(109%) contrast(104%);
+}
+
+#vacio-proyecto button{
+	font-size: 1em;
+	background: none;
+	border: none;
+	padding: 0.5em;
+}
+
+#vacio-proyecto button:hover{
+	background-color: #ffa;
+	color: #303030;
+	font-weight: 900;
+	cursor: pointer;
+}
+
+#vacio-archivo{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-content: center;
+	align-items: center;
+}
+#vacio-archivo img{
+	width: 10%;
+	filter: invert(99%) sepia(64%) saturate(1044%) hue-rotate(326deg) brightness(109%) contrast(104%);
 }
