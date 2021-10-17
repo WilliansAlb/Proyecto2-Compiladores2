@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 declare var require: any;
 import { ElementRef } from '@angular/core';
+import { asignacion_java } from 'src/assets/ts/asignacion';
+import { expresion_java } from 'src/assets/ts/expresion';
+import { if_java } from 'src/assets/ts/if';
+import { valor } from 'src/assets/ts/valor';
 declare var analizador2: any;
 
 @Component({
@@ -192,6 +196,9 @@ export class AppComponent implements OnInit{
   parsear(){
     var texto1: HTMLTextAreaElement = document.querySelector("#texto");
     if (texto1){
+      analizador2.yy.expresion_java = expresion_java;
+      analizador2.yy.valor_java = valor;
+      analizador2.yy.asignacion_java = asignacion_java;
       analizador2.parse(texto1.value);
     }
   }

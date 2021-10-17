@@ -20,6 +20,7 @@ operators                               ">>="|"<<="|"**="|"//="|"+="|"-="|"*="|
                                         "="|";"|"'"|"""|"#"|"\"          
 /** identifiers **/
 identifier                              ("_"|{letter})({letter}|{digit}|"_")*
+url                                     {identifier}('.'{identifier})?
 letter                                  {lowercase}|{uppercase}
 lowercase                               [a-z]
 uppercase                               [A-Z]
@@ -51,8 +52,10 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 %s INITIAL PYTHON DEDENT INDENT JAVA PROGRAMA
 
 %%
-<INITIAL>[\ \n]+                        %{ console.log("eninicio"); %}
+<INITIAL>[\ \n\r]+                        %{ console.log("eninicio"); %}
 <INITIAL>[\t]                           %{ console.log("tabulacion"); %}
+<INITIAL>'paquete'                      %{ return 'PAQUETE'; %}
+<INITIAL>{url}                          %{ return 'URL'; %}
 <INITIAL>{apertura_python}              %{ this.begin("PYTHON"); return 'PYTHON'; %}
 <PYTHON>[\ ]+                           %{ /*espacios en blanco*/ %}
 <PYTHON>\t                              %{ /*tabulacion*/ %}
@@ -147,17 +150,37 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 <JAVA>{digit}                           %{ return 'INT'; %}
 <JAVA>{shortstring_double}                   %{ return 'STRING'; %}
 <JAVA>{shortstring_single}                   %{ return 'CHAR'; %}
-<JAVA>{identifier}                      %{ return 'IDENTIFICADOR'; %}
+<JAVA>{identifier}                          %{ return 'IDENTIFICADOR'; %}
 <PROGRAMA>[\ \n\t\s\r]+                     %{ /*nada*/ %}
-<PROGRAMA>'hola'                        %{ return 'HOLA'; %}
+<PROGRAMA>'#include'                        %{ return 'INCLUDE'; %}
+<PROGRAMA>'"PY"'                            %{ return 'TODOPY'; %}
+<PROGRAMA>'"PY.'{identifier}'.'{identifier}'"'  %{ return 'ESPY'; %}
+<PROGRAMA>'"JAVA.*"'                            %{ return 'TODOJAVA'; %}
+<PROGRAMA>'"JAVA.'{identifier}'.'{identifier}'"'  %{ return 'JAVAARCHIVO'; %}
+<PROGRAMA>'"JAVA.'{identifier}'.*"'         %{ return 'JAVACLASES'; %}
+<PROGRAMA>'"JAVA.'{identifier}'"'         %{ return 'JAVACLASE'; %}
+<PROGRAMA>'main'                          %{ return 'MAIN'; %}
+<PROGRAMA>'void'                          %{ return 'VOID'; %}
+<PROGRAMA>'('                          %{ return 'PAR_A'; %}
+<PROGRAMA>'='                          %{ return 'IGUAL'; %}
+<PROGRAMA>')'                          %{ return 'PAR_C'; %}
+<PROGRAMA>'{'                          %{ return 'LLAVE_A'; %}
+<PROGRAMA>'}'                          %{ return 'LLAVE_C'; %}
+<PROGRAMA>'['                          %{ return 'COR_A'; %}
+<PROGRAMA>']'                          %{ return 'COR_C'; %}
+<PROGRAMA>'const'                          %{ return 'CONSTANTE'; %}
+<PROGRAMA>'int'                          %{ return 'INT'; %}
+<PROGRAMA>'float'                          %{ return 'FLOAT'; %}
+<PROGRAMA>'char'                          %{ return 'CHAR'; %}
+<PROGRAMA>{float}                          %{ return 'FLOATV'; %}
+<PROGRAMA>{digit}                          %{ return 'INTV'; %}
+<PROGRAMA>"'"."'"                          %{ return 'CHARV'; %}
+<PROGRAMA>{identifier}                     %{ return 'IDENTIFICADOR'; %}
+<PROGRAMA>';'                          %{ return 'PUNTOC'; %}
+
 <<EOF>>                        %{ return 'EOF'; %}
 
 /lex
-
-%{
-	const TIPO_DATO			= require('./tabla_simbolos').TIPO_DATO; 
-%}
-
 /* operator associations and precedence */
 %left MAS MENOS
 %left SUMA RESTA
@@ -176,8 +199,49 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 expressions
     : EOF
         {console.log("Vacio");}
-    |   PYTHON codigo_python JAVA codigo_java PROGRAMA HOLA EOF
-        {console.log("Encontrados bloques de python y de java")}
+    |   PAQUETE URL PYTHON codigo_python JAVA codigo_java PROGRAMA includes constantes EOF
+        {console.log("Encontrados bloques de python y de java ")}
+;
+
+constantes:
+    | lista_constantes
+;
+
+lista_constantes:
+    constante lista_constantesp
+;
+
+lista_constantesp:
+    |   lista_constantes
+;
+
+constante:
+    CONSTANTE CHAR IDENTIFICADOR IGUAL CHARV PUNTOC
+;
+
+includes:
+    |   lista_includes
+;
+
+lista_includes:
+    include lista_includesp
+;
+
+lista_includesp:
+    |   lista_includes
+;
+
+include:
+    INCLUDE tipos_include
+;
+
+tipos_include:
+    TODOPY
+    |   ESPY
+    |   TODOJAVA
+    |   JAVAARCHIVO
+    |   JAVACLASE
+    |   JAVACLASES
 ;
 
 codigo_java:
@@ -189,7 +253,12 @@ clases:
     | clase
 ;
 clase:
-    'public' 'class' IDENTIFICADOR herencia '{' body_class '}'
+    'public' 'class' IDENTIFICADOR herencia '{' body_classp '}'
+;
+
+body_classp:
+        {console.log("clase sin cuerpo");}
+    | body_class
 ;
 
 body_class:
@@ -272,7 +341,7 @@ declaracion_java:
 
 asignacion_java:
     IDENTIFICADOR ASIGNAR expresion_java ';'
-        {console.log("Asignacion normal");}
+        {console.log("Asignacion normal"); var asig = new yy.asignacion_java($1,$3,"normal",0,0); asig.ejecutar(); }
     | IDENTIFICADOR MAS_ASIGNAR expresion_java ';'
         {console.log("Asignacion incremencial");}
     | IDENTIFICADOR MAS ';'
@@ -366,10 +435,15 @@ herencia:
 
 expresion_java:
     expresion_java SUMA expresion_java
+        { $$ = new yy.expresion_java("+",$1,$3,null,0,0);}
     | expresion_java POR expresion_java
+        { $$ = new yy.expresion_java("*",$1,$3,null,0,0);}
     | expresion_java ENTRE expresion_java
+        { $$ = new yy.expresion_java("/",$1,$3,null,0,0);}
     | expresion_java POT expresion_java
+        { $$ = new yy.expresion_java("^",$1,$3,null,0,0);}
     | expresion_java RESTA expresion_java
+        { $$ = new yy.expresion_java("-",$1,$3,null,0,0);}
     | RESTA expresion_java
     %prec UMINUS
     | expresion_java AND expresion_java
@@ -382,16 +456,22 @@ expresion_java:
     | expresion_java MENOR expresion_java
     | expresion_java MENOR_IGUAL expresion_java
     | '(' expresion_java ')'
+        { $$ = $2; }
     | IDENTIFICADOR
+        { $$ = new yy.expresion_java("val",null,null,new yy.valor_java($1,"identificador",0,0),0,0);}
     | INT
+        { $$ = new yy.expresion_java("val",null,null,new yy.valor_java($1,"int",0,0),0,0);}
     | STRING
+        { $$ = new yy.expresion_java("val",null,null,new yy.valor_java($1,"string",0,0),0,0);}
     | FLOAT
+        { $$ = new yy.expresion_java("val",null,null,new yy.valor_java($1,"float",0,0),0,0);}
     | CHAR
+        { $$ = new yy.expresion_java("val",null,null,new yy.valor_java($1,"char",0,0),0,0);}
     | IDENTIFICADOR '(' ')'
     | 'true'
-        { $$ = true; }
+        { $$ = new yy.expresion_java("val",null,null,new yy.valor_java($1,"boolean",0,0),0,0);}
     | 'false'
-        { $$ = false; }
+        { $$ = new yy.expresion_java("val",null,null,new yy.valor_java($1,"false",0,0),0,0);}
 ;
 
 codigo_python:
