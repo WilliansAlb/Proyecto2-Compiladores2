@@ -56,6 +56,20 @@ export class expresion_java{
 					resultado = "Tipos incompatibles";
 				}
 			return new valor(resultado,respuesta,terminoA.linea,terminoA.columna);
+		}  else if (this.operacion==="%"){
+			var resultado:any;
+			var respuesta:String;
+			if ((terminoA.tipo==="int" || terminoA.tipo === "float" || terminoA.tipo ==="boolean") &&
+				(terminoB.tipo==="int" || terminoB.tipo === "float" || terminoB.tipo ==="boolean")){
+					respuesta = "boolean";
+					respuesta = (terminoA.tipo==="int" || terminoB.tipo ==="int")?"int":respuesta;
+					respuesta = (terminoA.tipo==="float" || terminoB.tipo ==="float")?"float":respuesta;
+					resultado = (terminoA.tipo==="float" || terminoB.tipo ==="float")?parseFloat(terminoA.valor)%parseFloat(terminoB.valor):parseInt(terminoA.valor)%parseInt(terminoB.valor);
+				} else {
+					respuesta = "error";
+					resultado = "Tipos incompatibles";
+				}
+			return new valor(resultado,respuesta,terminoA.linea,terminoA.columna);
 		} else if (this.operacion==="/"){
 			var resultado:any = terminoA.valor/terminoB.valor;
 			if (resultado==NaN){

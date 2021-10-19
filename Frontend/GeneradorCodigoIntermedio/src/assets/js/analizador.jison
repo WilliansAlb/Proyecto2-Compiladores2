@@ -163,6 +163,7 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 <PROGRAMA>'"JAVA.'{identifier}'"'         %{ return 'JAVACLASE'; %}
 <PROGRAMA>'main'                          %{ return 'MAIN'; %}
 <PROGRAMA>'void'                          %{ return 'VOID'; %}
+<PROGRAMA>':'                          %{ return 'DOS_P'; %}
 <PROGRAMA>'('                          %{ return 'PAR_A'; %}
 <PROGRAMA>'='                          %{ return 'IGUAL'; %}
 <PROGRAMA>')'                          %{ return 'PAR_C'; %}
@@ -170,17 +171,26 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 <PROGRAMA>'}'                          %{ return 'LLAVE_C'; %}
 <PROGRAMA>'['                          %{ return 'COR_A'; %}
 <PROGRAMA>']'                          %{ return 'COR_C'; %}
+<PROGRAMA>'++'                          %{ return 'MAS'; %}
 <PROGRAMA>'+'                          %{ return 'SUMA'; %}
+<PROGRAMA>'--'                          %{ return 'MENOS'; %}
 <PROGRAMA>'-'                          %{ return 'RESTA'; %}
 <PROGRAMA>'*'                          %{ return 'POR'; %}
 <PROGRAMA>'/*'                         %{ this.begin('BLOQUE_COMENTARIO'); %}
 <PROGRAMA>'//'                         %{ this.begin("COMENTARIO"); %}
 <COMENTARIO>[\n]                       %{ this.begin('PROGRAMA'); %}
-<COMENTARIO>[^\n]+                     %{ agregarErrores(yytext,'COMENTARIO BLOQUE','COMENTARIO',yylineno,yyleng) %}
+<COMENTARIO>[^\n]+                     %{ agregarErrores(yytext,'COMENTARIO BLOQUE','COMENTARIO',yylineno,0); %}
 <BLOQUE_COMENTARIO>'*/'                %{ this.begin('PROGRAMA'); %}
-<BLOQUE_COMENTARIO>[^'*/']+            %{ agregarErrores(yytext,'COMENTARIO','COMENTARIO',yylineno,yyleng) %}
+<BLOQUE_COMENTARIO>[^'*/']+            %{ agregarErrores(yytext,'COMENTARIO','COMENTARIO',yylineno,0); %}
 <PROGRAMA>'/'                          %{ return 'ENTRE'; %}
 <PROGRAMA>'%'                          %{ return 'MOD'; %}
+<PROGRAMA>'&&'                          %{ return 'AND'; %}
+<PROGRAMA>'||'                          %{ return 'OR'; %}
+<PROGRAMA>'<'                          %{ return 'MENOR'; %}
+<PROGRAMA>'>'                          %{ return 'MAYOR'; %}
+<PROGRAMA>'=='                          %{ return 'IGUAL_IGUAL'; %}
+<PROGRAMA>'!='                          %{ return 'DIFF'; %}
+<PROGRAMA>'!'                          %{ return 'NOT'; %}
 <PROGRAMA>'const'                          %{ return 'CONSTANTE'; %}
 <PROGRAMA>'int'                          %{ return 'INT'; %}
 <PROGRAMA>'float'                          %{ return 'FLOAT'; %}
@@ -193,15 +203,28 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 <PROGRAMA>'continue'                          %{ return 'CONTINUE'; %}
 <PROGRAMA>'break'                          %{ return 'BREAK'; %}
 <PROGRAMA>'scanf'                          %{ return 'SCANF'; %}
-<PROGRAMA>'scanf'                          %{ return 'SCANF'; %}
+<PROGRAMA>'case'                          %{ return 'CASE'; %}
+<PROGRAMA>'switch'                          %{ return 'SWITCH'; %}
+<PROGRAMA>'default'                          %{ return 'DEFAULT'; %}
 <PROGRAMA>'clrscr'                          %{ return 'CLEAR'; %}
 <PROGRAMA>'getch'                          %{ return 'GETCH'; %}
 <PROGRAMA>{float}                          %{ return 'FLOATV'; %}
 <PROGRAMA>{digit}                          %{ return 'INTV'; %}
 <PROGRAMA>"'"."'"                          %{ return 'CHARV'; %}
+<PROGRAMA>'"'([^'%d''%c''%f']*|('%d'|'%c'|'%f'))+'"' %{ 
+    if (yytext.includes('%c')){
+        return 'SCANCHAR';
+    } else if (yytext.includes('%d')){
+        return 'SCANINT';
+    } else if (yytext.includes('%f')){
+        return 'SCANFLOAT';
+    } else {
+        return 'STRING';
+    } %}
 <PROGRAMA>'&'{identifier}                     %{ return 'IDENTIFICADORREF'; %}
 <PROGRAMA>{identifier}                     %{ return 'IDENTIFICADOR'; %}
 <PROGRAMA>';'                          %{ return 'PUNTOC'; %}
+<PROGRAMA>','                          %{ return 'COMA'; %}
 
 <<EOF>>                        %{ return 'EOF'; %}
 
@@ -221,7 +244,7 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 %left POT
 %left OR
 %left AND
-%left IGUAL_IGUAL DIFERENTE MAYOR MAYOR_IGUAL MENOR MENOR_IGUAL
+%left IGUAL_IGUAL DIFERENTE DIFF MAYOR MAYOR_IGUAL MENOR MENOR_IGUAL
 %right NOT
 %left UMINUS
 
@@ -232,7 +255,7 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 expressions
     : EOF
         {console.log("Vacio");}
-    |   PAQUETE URL PYTHON codigo_python JAVA codigo_java PROGRAMA includes constantes globales EOF
+    |   PAQUETE URL PYTHON codigo_python JAVA codigo_java PROGRAMA includes constantes globales main EOF
         {console.log("Encontrados bloques de python y de java "); console.log(errores);}
 ;
 
@@ -261,24 +284,21 @@ lista_globalesp:
 ;
 
 var_global:
-    tipos_datos IDENTIFICADOR IGUAL dato PUNTOC
+    tipos_datos IDENTIFICADOR IGUAL expresion_c PUNTOC
     |   tipos_datos IDENTIFICADOR dimensiones PUNTOC
 ;
 
 dimensiones:
-    COR_A expresion COR_C dimensionesp
+    COR_A expresion_c COR_C dimensionesp
 ;
 
 dimensionesp:
     |   dimensiones
 ;
 
-expresion:
-    | INTV
-;
 
 constante:
-    CONSTANTE tipos_datos IDENTIFICADOR IGUAL dato PUNTOC
+    CONSTANTE tipos_datos IDENTIFICADOR IGUAL expresion_c PUNTOC
 ;
 
 tipos_datos:
@@ -307,18 +327,117 @@ sentencias_c:
 ;
 
 sentencia_c:
+    una_linea_c
+    |   bloque_c
+;
+
+bloque_c:
+	if_c
+	|	for_c
+	|	while_c
+    |   do_while_c
+    |   switch_c
+    |   error LLAVE_C
+;
+
+una_linea_c:
     asignacion_c
     |   declaracion_c
+    |   BREAK PUNTOC
+    |   CONTINUE PUNTOC
+    |   CLEAR PAR_A PAR_C PUNTOC
+    |   GETCH PAR_A PAR_C PUNTOC
+    |   SCANF PAR_A tipos_scan_c COMA IDENTIFICADORREF PAR_C
+        { console.log($3); }
+    |   error PUNTOC
+;
+
+tipos_scan_c:
+    SCANINT
+        {
+            console.log("scan int");
+        }
+    |   SCANCHAR
+        {
+            console.log("scan char");
+        }
+    |   SCANFLOAT
+        {
+            console.log("scan float");
+        }
+;
+
+expresion_c:
+    expresion_c SUMA expresion_c
+    |   expresion_c POR expresion_c
+    |   expresion_c ENTRE expresion_c
+    |   expresion_c MOD expresion_c
+    |   expresion_c RESTA expresion_c
+    |   RESTA expresion_c
+    %prec UMINUS
+    |   expresion_c MAYOR expresion_c
+    |   expresion_c MENOR expresion_c
+    |   expresion_c IGUAL_IGUAL expresion_c
+    |   expresion_c DIFF expresion_c
+    |   expresion_c AND expresion_c
+    |   expresion_c OR expresion_c
+    |   PAR_A expresion_c PAR_C
+    |   NOT expresion_c
+    |   dato
+;
+
+switch_c:
+    SWITCH PAR_A IDENTIFICADOR PAR_C LLAVE_A lista_casos_c default_c LLAVE_C
+;
+
+lista_casos_c:
+    lista_casos_c caso_c
+    |   caso_c
+;
+
+caso_c:
+    CASE dato DOS_P lista_sentencias_c
+;
+
+default_c:
+    |   DEFAULT DOS_P lista_sentencias_c
+;
+
+do_while_c:
+    DO LLAVE_A lista_sentencias_c LLAVE_C WHILE PAR_A expresion_c PAR_C PUNTOC
+;
+
+if_c:
+	IF PAR_A expresion_c PAR_C LLAVE_A lista_sentencias_c LLAVE_C
+	|	IF PAR_A expresion_c PAR_C LLAVE_A lista_sentencias_c LLAVE_C ELSE LLAVE_A lista_sentencias_c LLAVE_C
+;
+
+for_c:
+	FOR PAR_A declaracion_for_c PUNTOC expresion_c PUNTOC inc_dec_c PAR_C LLAVE_A lista_sentencias_c LLAVE_C
+;
+
+while_c:
+	WHILE PAR_A expresion_c PAR_C LLAVE_A lista_sentencias_c LLAVE_C
+;
+
+inc_dec_c:
+	INTV MAS
+	| INTV MENOS
+;
+
+declaracion_for_c:
+	INT IDENTIFICADOR IGUAL expresion_c
+    |   IDENTIFICADOR IGUAL expresion_c
 ;
 
 declaracion_c:
-    tipos_datos IDENTIFICADOR IGUAL dato PUNTOC
+    tipos_datos IDENTIFICADOR IGUAL expresion_c PUNTOC
     | tipos_datos IDENTIFICADOR dimensiones PUNTOC
 ;
 
 asignacion_c:
-    IDENTIFICADOR IGUAL dato PUNTOC
-    |   IDENTIFICADOR dimensiones IGUAL dato PUNTOC
+    IDENTIFICADOR IGUAL expresion_c PUNTOC
+    |   IDENTIFICADOR dimensiones IGUAL expresion_c PUNTOC
 ;
 
 includes:

@@ -30,7 +30,6 @@
               "src/styles.css"
             ],
             "scripts": [
-              "src/assets/js/textarea.js",
               "src/assets/js/analizador.js"
             ]
           },

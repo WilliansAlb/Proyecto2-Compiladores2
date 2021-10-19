@@ -3,20 +3,29 @@ declare var require: any;
 import { ElementRef } from '@angular/core';
 import { asignacion_java } from 'src/assets/ts/asignacion';
 import { expresion_java } from 'src/assets/ts/expresion';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { if_java } from 'src/assets/ts/if';
 import { valor } from 'src/assets/ts/valor';
-declare var analizador2: any;
+declare var $: any;
+declare var analizador: any;
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
   title = 'GeneradorCodigoIntermedio';
-  constructor(private elRef: ElementRef) { }
-  ngOnInit(){
+  constructor(private elRef: ElementRef, private http: HttpClient) { }
+  ngOnInit() {
+  }
 
+  realizarConexion() {
+    this.http.get('http://localhost:4200/Texto').subscribe(data => {   // data is already a JSON object
+      var texto:String = data['texto'];
+      console.log(texto);
+      return texto;
+    });
   }
 
   ngAfterViewInit() {
@@ -113,21 +122,21 @@ export class AppComponent implements OnInit{
       ta.onmouseup = function () { this.mouseisdown = false; this.paintLineNumbers(); };
       ta.onmousemove = function () { if (this.mouseisdown) this.paintLineNumbers(); actualizar_lineas(this); };
       ta.onkeyup = function () { this.paintLineNumbers(); actualizar_lineas(this); };
-      ta.onkeydown = function (e:any) { 
+      ta.onkeydown = function (e: any) {
         if (e.key == 'Tab') {
           e.preventDefault();
           var start = this.selectionStart;
           var end = this.selectionEnd;
-      
+
           // set textarea value to: text before caret + tab + text after caret
           this.value = this.value.substring(0, start) +
             "\t" + this.value.substring(end);
-      
+
           // put caret at right position again
           this.selectionStart =
             this.selectionEnd = start + 1;
         }
-       };
+      };
 
       //document.getElementById("textarea").appendChild(div);
       // make sure it's painted
@@ -136,7 +145,10 @@ export class AppComponent implements OnInit{
       return ta;
     };
     var ejecutar = TextAreaLineNumbersWithCanvas();
-    console.log("ejecuta bien")
+    this.http.get('http://localhost:4200/Texto').subscribe(data => {   // data is already a JSON object
+      var texto:String = data['texto'];
+      ejecutar.textContent = texto;
+    });
     function actualizar_lineas(textarea: HTMLTextAreaElement) {
       var textLines = textarea.value.substr(0, textarea.selectionStart).split("\n");
       var currentLineNumber = textLines.length;
@@ -193,34 +205,40 @@ export class AppComponent implements OnInit{
         break;
     }
   }
-  parsear(){
+  parsear() {
     var texto1: HTMLTextAreaElement = document.querySelector("#texto");
-    if (texto1){
-      analizador2.yy.expresion_java = expresion_java;
-      analizador2.yy.valor_java = valor;
-      analizador2.yy.asignacion_java = asignacion_java;
-      analizador2.parse(texto1.value);
+    if (texto1) {
+      analizador.yy.expresion_java = expresion_java;
+      analizador.yy.valor_java = valor;
+      analizador.yy.asignacion_java = asignacion_java;
+      console.log(analizador.errores);
+      analizador.parse(texto1.value);
     }
   }
 
 }
 window.onload = () => {
   var toggler = document.getElementsByClassName("caret");
-    var il: any;
-    for (il = 0; il < toggler.length; il++) {
-      var to: any = toggler[il];
-      to.addEventListener("click", function () {
-        this.parentElement?.querySelector(".nested")?.classList.toggle("active");
-        console.log(to.parentElement.querySelector(".nested"));
-        this.classList.toggle("caret-down");
-        var img: any = this.querySelectorAll(".folder")[0];
-        if (to.classList.contains("caret-down")) {
-          img.src = "assets/img/folder-abierto.png";
-          console.log("abierto");
-        } else {
-          img.src = "assets/img/folder-cerrado.png";
-          console.log("cerrado");
-        }
-      });
-    }
+  var il: any;
+  for (il = 0; il < toggler.length; il++) {
+    var to: any = toggler[il];
+    to.addEventListener("click", function () {
+      this.parentElement?.querySelector(".nested")?.classList.toggle("active");
+      console.log(to.parentElement.querySelector(".nested"));
+      this.classList.toggle("caret-down");
+      var img: any = this.querySelectorAll(".folder")[0];
+      if (to.classList.contains("caret-down")) {
+        img.src = "assets/img/folder-abierto.png";
+        console.log("abierto");
+      } else {
+        img.src = "assets/img/folder-cerrado.png";
+        console.log("cerrado");
+      }
+    });
+  }
 };
+
+interface prueba {
+  texto: String;
+
+}
