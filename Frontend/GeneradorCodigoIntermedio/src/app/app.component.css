@@ -1,0 +1,14 @@
+
+table{
+	border-collapse: collapse;
+	font-size: 0.8em;
+}
+
+.cabeza{
+	background-color: #303030;
+	border: 1px solid white;
+}
+
+.cuerpo1{
+	border: 1px solid white;
+}

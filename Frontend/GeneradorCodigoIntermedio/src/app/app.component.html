@@ -1,122 +1,164 @@
 <nav>
-  <img src="assets/img/program.png" width="40px">
+    <img src="assets/img/program.png" width="40px">
 </nav>
 <div id="menu">
-  <div class="dropdown">
-    <button class="dropbtn">Archivo</button>
-    <div class="dropdown-content">
-      <a href="#">Nuevo archivo</a>
-      <a href="#">Abrir proyecto</a>
-      <a href="#">Abrir archivo</a>
-      <a href="#">Guardar</a>
-      <a href="#">Guardar como</a>
-      <a href="#">Cerrar proyecto</a>
+    <div class="dropdown">
+        <button class="dropbtn">Archivo</button>
+        <div class="dropdown-content">
+            <a href="#">Nuevo archivo</a>
+            <a href="#">Abrir proyecto</a>
+            <a href="#">Abrir archivo</a>
+            <a href="#">Guardar</a>
+            <a href="#">Guardar como</a>
+            <a href="#">Cerrar proyecto</a>
+        </div>
     </div>
-  </div>
-  <div class="dropdown">
-    <button class="dropbtn">Generar</button>
-    <div class="dropdown-content">
-      <a href="#">Código en tres direcciones</a>
-      <a href="#">Código optimizado</a>
-      <a href="#">Código assembler</a>
+    <div class="dropdown">
+        <button class="dropbtn">Generar</button>
+        <div class="dropdown-content">
+            <a href="#">Código en tres direcciones</a>
+            <a href="#">Código optimizado</a>
+            <a href="#">Código assembler</a>
+        </div>
     </div>
-  </div>
-  <div class="dropdown">
-    <button class="dropbtn">Descargar</button>
-    <div class="dropdown-content">
-      <a href="#">Código en tres direcciones</a>
-      <a href="#">Código optimizado</a>
-      <a href="#">Código assembler</a>
+    <div class="dropdown">
+        <button class="dropbtn">Descargar</button>
+        <div class="dropdown-content">
+            <a href="#">Código en tres direcciones</a>
+            <a href="#">Código optimizado</a>
+            <a href="#">Código assembler</a>
+        </div>
     </div>
-  </div>
-  <div class="dropdown">
-    <button class="dropbtn">Reporte</button>
-    <div class="dropdown-content">
-      <a href="#">Ver reporte</a>
+    <div class="dropdown">
+        <button class="dropbtn">Reporte</button>
+        <div class="dropdown-content">
+            <a href="#">Ver reporte</a>
+        </div>
     </div>
-  </div>
 </div>
 <div id="cuerpo">
-  <div id="pestaña">
-    <div class="contenedor-img seleccionado-contenedor">
-      <img src="assets/img/codearea.png" title="Editor de codigo" width="40px" id="codearea"
-        class="pestañas seleccionado" (click)="imgClick(0)">
+    <div id="pestaña">
+        <div class="contenedor-img seleccionado-contenedor">
+            <img src="assets/img/codearea.png" title="Editor de codigo" width="40px" id="codearea"
+                class="pestañas seleccionado" (click)="imgClick(0)">
+        </div>
+        <div class="contenedor-img">
+            <img src="assets/img/c.png" title="Codigo tres direcciones C" width="40px" id="c" class="pestañas"
+                (click)="imgClick(1)">
+        </div>
+        <div class="contenedor-img">
+            <img src="assets/img/cop.png" title="Codigo optimizado C" width="40px" id="cop" class="pestañas"
+                (click)="imgClick(2)">
+        </div>
+        <div class="contenedor-img">
+            <img src="assets/img/asm.png" title="Codigo optimizado Assembler" width="40px" id="asm" class="pestañas"
+                (click)="imgClick(3)">
+        </div>
+        <div class="contenedor-img">
+            <img src="assets/img/reporte2.png" title="Reportes" width="40px" id="reporte" class="pestañas"
+                (click)="imgClick(4)">
+        </div>
+        <div class="contenedor-img">
+            <img src="assets/img/reporte.png" title="Errores" width="40px" id="errores" class="pestañas"
+                (click)="imgClick(5)">
+        </div>
     </div>
-    <div class="contenedor-img">
-      <img src="assets/img/c.png" title="Codigo tres direcciones C" width="40px" id="c" class="pestañas"
-      (click)="imgClick(1)">
+    <div id="area-editor" class="areas">
+        <div id="arbol">
+            <div class="contenedor-img">
+                <span>PROYECTO</span>
+                <img src="assets/img/abrir.png" title="Abrir" width="20px" id="abrir" style="margin-left: 1em;" (click)="abrir_proyecto()">
+                <img src="assets/img/cerrar.png" title="Cerrar" width="20px" id="cerrar" style="margin-left: 1em;">
+            </div>
+            <hr>
+            <div id="contenedor-arbol" style="display: block;">
+            </div>
+            <div id="vacio-proyecto" style="display: none;">
+                <img src="assets/img/vacio.png" alt="Vacio" title="Vacio">
+                <button>Crea un proyecto</button>
+                <span>o</span>
+                <button>Abre un proyecto</button>
+            </div>
+        </div>
+        <div id="textarea-object">
+            <div id="menu-archivo">
+                <span id="nombre-archivo">sin-titulo.mgl<img src="assets/img/cerrar2.png" title="Cerrar" width="12em"
+                        id="cerrar-archivo"></span>
+                <img src="assets/img/guardar.png" alt="Guardar" width="21em" height="21em" title="Guardar">
+                <img src="assets/img/guardar-como.png" alt="Guardar-como" width="25em" height="25em"
+                    title="Guardar como">
+                <img src="assets/img/generar.png" alt="Generar" width="25em" height="25em"
+                    title="Generar codigo tres direcciones" (click)="parsear()">
+					<button style="display: none;" value="" id="editando"></button>
+            </div>
+            <div id="textarea" #txtarea></div>
+            <div id="visor">Linea: 1 Columna: 0</div>
+        </div>
+        <div id="vacio-archivo" style="display: none;">
+            <img src="assets/img/vacio.png" alt="No hay archivo abierto" title="Vacio" width="50%">
+            <span>Al parecer no has abierto ningún archivo</span>
+        </div>
     </div>
-    <div class="contenedor-img">
-      <img src="assets/img/cop.png" title="Codigo optimizado C" width="40px" id="cop" class="pestañas"
-        (click)="imgClick(2)">
+    <div id="area-errores" class="areas"
+        style="display: none; flex-direction: column; justify-content: flex-start; align-items: center; ">
+        <div id="selector-errores" style="width: 100%;text-align: center;background-color: #3b3b3b;">
+            <h1>Reporte de errores</h1>
+            <table style="width: 100%;table-layout: fixed;">
+                <colgroup>
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th colspan=2></th>
+                        <th colspan=1 class="cabeza">#</th>
+                        <th colspan=2 class="cabeza">LEXEMA</th>
+                        <th colspan=3 class="cabeza">TIPO</th>
+                        <th colspan=8 class="cabeza">RAZON</th>
+                        <th colspan=1 class="cabeza">LINEA</th>
+                        <th colspan=1 class="cabeza">COLUMNA</th>
+                        <th colspan=2></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan=2><img src="assets/img/flecha.png" title="Codigo tres direcciones C" width="40px"
+                                id="c" class="pestañas voltear" (click)="focusearAnterior()"></td>
+                        <td colspan=1 class="cuerpo1" id="no_error"></td>
+                        <td colspan=2 class="cuerpo1" id="lexema_error"></td>
+                        <td colspan=3 class="cuerpo1" id="tipo_error"></td>
+                        <td colspan=8 class="cuerpo1" id="razon_error" style="word-wrap:break-word; font-size: 1em;">
+                        </td>
+                        <td colspan=1 class="cuerpo1" id="linea_error"></td>
+                        <td colspan=1 class="cuerpo1" id="columna_error"></td>
+                        <td colspan=2><img src="assets/img/flecha.png" title="Codigo tres direcciones C" width="40px"
+                                id="c" class="pestañas" (click)="focusearSiguiente()"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="lista-errores" style="width: 100%;"></div>
     </div>
-    <div class="contenedor-img">
-      <img src="assets/img/asm.png" title="Codigo optimizado Assembler" width="40px" id="asm" class="pestañas"
-      (click)="imgClick(3)">
-    </div>
-    <div class="contenedor-img">
-      <img src="assets/img/reporte2.png" title="Reportes" width="40px" id="reporte" class="pestañas"
-      (click)="imgClick(4)">
-    </div>
-    <div class="contenedor-img">
-      <img src="assets/img/reporte.png" title="Errores" width="40px" id="errores" class="pestañas"
-      (click)="imgClick(5)">
-    </div>
-  </div>
-  <div id="area-editor">
-    <div id="arbol">
-      <div class="contenedor-img">
-        <span>PROYECTO</span>
-        <img src="assets/img/abrir.png" title="Abrir" width="20px" id="abrir" style="margin-left: 1em;">
-        <img src="assets/img/cerrar.png" title="Cerrar" width="20px" id="cerrar" style="margin-left: 1em;">
-      </div>
-      <hr>
-      <div id="contenedor-arbol" style="display: block;">
-        <ul>
-          <li><span class="caret"><img width="15em" src="assets/img/folder-cerrado.png" class="folder" title="Paquete">Paquete</span><img width="15em" class="nuevo-archivo" onclick="nuevo_archivo(this)" title="Nuevo archivo">
-            <ul class="nested">
-              <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
-              <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
-              <li><span class="caret"><img width="15em" src="assets/img/folder-cerrado.png" class="folder" title="Paquete">Paquete</span><img width="15em" class="nuevo-archivo" onclick="nuevo_archivo(this)" title="Nuevo archivo">
-                <ul class="nested">
-                  <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
-                  <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
-                  <li><span class="caret"><img width="15em" src="assets/img/folder-cerrado.png" class="folder" title="Paquete">Paquete</span><img width="15em" class="nuevo-archivo" onclick="nuevo_archivo(this)" title="Nuevo archivo">
-                    <ul class="nested">
-                      <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
-                      <li><div class="div-archivo"><img width="15em" class="archivo" title=".mgl">archivo</div></li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-      <div id="vacio-proyecto">
-        <img src="assets/img/vacio.png" alt="Vacio" title="Vacio">
-        <button>Crea un proyecto</button>
-        <span>o</span>
-        <button>Abre un proyecto</button>
-      </div>
-    </div>
-    <div id="textarea-object">
-      <div id="menu-archivo">
-        <span id="nombre-archivo">sin-titulo.mgl<img src="assets/img/cerrar2.png" title="Cerrar" width="12em" id="cerrar-archivo"></span>
-        <img src="assets/img/guardar.png" alt="Guardar" width="21em" height="21em" title="Guardar">
-        <img src="assets/img/guardar-como.png" alt="Guardar-como" width="25em" height="25em" title="Guardar como">
-        <img src="assets/img/generar.png" alt="Generar" width="25em" height="25em" title="Generar codigo tres direcciones" (click)="parsear()">
-      </div>
-      <div id="textarea" #txtarea ></div>
-      <div id="visor">Linea: 1 Columna: 0</div>
-    </div>
-    <div id="vacio-archivo" style="display: none;">
-      <img src="assets/img/vacio.png" alt="No hay archivo abierto" title="Vacio" width="50%">
-      <span>Al parecer no has abierto ningún archivo</span>
-    </div>
-  </div>
 </div>
 <div id="oculto">
-
+	<div id="flexible"><div class="loader"></div></div>
 </div>
 <router-outlet></router-outlet>

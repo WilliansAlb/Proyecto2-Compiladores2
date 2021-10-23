@@ -4,9 +4,17 @@
         <servlet-name>Texto</servlet-name>
         <servlet-class>Servlets.Texto</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Paquetes</servlet-name>
+        <servlet-class>Servlets.Paquetes</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Texto</servlet-name>
-        <url-pattern>/Texto</url-pattern>
+        <url-pattern>/api/Texto</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Paquetes</servlet-name>
+        <url-pattern>/api/Paquetes</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -5,27 +5,17 @@
  */
 package POJO;
 
-import java.io.Serializable;
-
 /**
  *
  * @author willi
  */
-public class Archivo implements Serializable{
-    private String texto;
+public class Proyecto {
     private String nombre;
+    private Directorio carpeta;
 
-    public Archivo(String texto, String nombre) {
-        this.texto = texto;
+    public Proyecto(String nombre, Directorio carpeta) {
         this.nombre = nombre;
-    }
-
-    public String getTexto() {
-        return texto;
-    }
-
-    public void setTexto(String texto) {
-        this.texto = texto;
+        this.carpeta = carpeta;
     }
 
     public String getNombre() {
@@ -35,7 +25,14 @@ public class Archivo implements Serializable{
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-    
+
+    public Directorio getCarpeta() {
+        return carpeta;
+    }
+
+    public void setCarpeta(Directorio carpeta) {
+        this.carpeta = carpeta;
+    }
     
     
 }

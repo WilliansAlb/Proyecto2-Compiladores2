@@ -298,6 +298,9 @@ textarea:focus-visible {
 	width: 100%;
 	height: 100%;
 	display: none;
+	background-color: #00000080;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .padre{
@@ -312,7 +315,7 @@ textarea:focus-visible {
 
 .nuevo-archivo{
 	float: right;
-	margin-top: 0.4em;
+	margin-top: 0.3em;
 	filter: invert(36%) sepia(6%) saturate(4%) hue-rotate(335deg) brightness(97%) contrast(84%);
 	content: url("../img/archivo-nuevo.png");
 	vertical-align: middle;
@@ -385,3 +388,70 @@ textarea:focus-visible {
 	width: 10%;
 	filter: invert(99%) sepia(64%) saturate(1044%) hue-rotate(326deg) brightness(109%) contrast(104%);
 }
+
+.voltear{
+	transform: rotateZ(180deg);
+}
+#selector-errores{
+	padding-bottom: 0.8em;
+}
+
+#flexible{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 2em;
+	background-color: #303030;
+	border-bottom-left-radius: 1em;
+	border-bottom-right-radius: 1em;
+}
+
+#flexible .presionar{
+	background-color: grey;
+	border-radius: 1em;
+	margin: 0.5em;
+	padding: 1em;
+	width: 100%;
+}
+
+#flexible .presionar:hover{
+	background-color: black;
+	cursor: pointer;
+	color: yellow;
+}
+
+.cerrar{
+	padding: 0.5em;
+	border-radius: 1em;
+	background-color: red;
+}
+
+.cerrar:hover{
+	cursor: pointer;
+}
+
+.div-archivo{
+	background-color: transparent;
+	border: none;
+}
+
+.div-archivo:hover{
+	transform: scale(1.1);
+	border-radius: 1em;
+	cursor:pointer;
+}
+
+.loader {
+	border: 16px solid #f3f3f3; /* Light grey */
+	border-top: 16px solid #3498db; /* Blue */
+	border-radius: 50%;
+	width: 120px;
+	height: 120px;
+	animation: spin 2s linear infinite;
+  }
+  
+  @keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+  }

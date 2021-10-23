@@ -1,5 +1,5 @@
 {   
-	"/Texto": {
+	"/api/*": {
 	  "target": "http://localhost:8080/Backend",
 	  "secure": false
 	}

@@ -1,5 +1,9 @@
 %{ var indents = [0], indent = 0, indent_actual = 0, dedents = 0, val_actual = "" %}
 %lex
+%{  
+    if (!('codigo3D' in yy)){ yy.codigo3D = "#include <stdio.h>\nvoid main(){\n"; }
+    if (!('etiquetas' in yy)){ yy.etiquetas = 0; } 
+%}
 reserved                                {keywords}|{operators}
 keywords                                "continue"|"finally"|"return"|"global"|
                                         "assert"|"except"|"import"|"lambda"|
@@ -227,17 +231,27 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 <PROGRAMA>','                          %{ return 'COMA'; %}
 
 <<EOF>>                        %{ return 'EOF'; %}
-
 /lex
 /* operator associations and precedence */
 %{
-	var errores = [];
+var errores = [];
+var conteo_errores= 0;
 
-    function agregarErrores(valor,tipo,razon,linea,columna){
-        errores.push({valor:valor,tipo:tipo,razon:razon,linea:linea,columna:columna});
+function agregarErrores(valor,tipo,razon,linea,columna){
+    errores.push({valor:valor,tipo:tipo,razon:razon,linea:linea,columna:columna});
+    conteo_errores++;
+}
+
+function soloNumeros(dato){
+    if (dato.tipo=="char"){
+        dato.valor = dato.valor.charCodeAt(0);
+        dato.tipo = "int";
+        return dato;
+    } else {
+        return dato;
     }
+}
 %}
-
 %left MAS MENOS
 %left SUMA RESTA
 %left POR ENTRE MOD
@@ -251,12 +265,26 @@ float                                   ([0]|[1-9][0-9]*)("."[0-9]+)
 %start expressions
 
 %% /* language grammar */
-
 expressions
     : EOF
         {console.log("Vacio");}
-    |   PAQUETE URL PYTHON codigo_python JAVA codigo_java PROGRAMA includes constantes globales main EOF
-        {console.log("Encontrados bloques de python y de java "); console.log(errores);}
+    |
+        PAQUETE URL PYTHON codigo_python JAVA codigo_java PROGRAMA includes constantes globales main EOF
+        {
+            var obj = new Object();
+            obj.errores = errores;
+            obj.codigo3D = yy.codigo3D;
+            obj.conteo = conteo_errores;
+            return obj;
+        }
+    |   error EOF
+        {
+            var obj = new Object();
+            obj.errores = errores;
+            obj.codigo3D = yy.codigo3D;
+            obj.conteo = conteo_errores;
+            return obj;
+        }
 ;
 
 constantes:
@@ -308,9 +336,30 @@ tipos_datos:
 ;
 
 dato:
-    INTV
+    INTV 
+        {
+            var obj = new Object();
+            obj.valor = parseInt($1);
+            obj.respuesta = parseInt($1);
+            obj.tipo = "int";
+            $$ = obj;
+        }
     | CHARV
+        {
+            var obj = new Object();
+            obj.valor = $1.charCodeAt(1);
+            obj.respuesta = $1;
+            obj.tipo = "int";
+            $$ = obj;
+        }
     | FLOATV
+        {
+            var obj = new Object();
+            obj.valor = parseFloat($1);
+            obj.respuesta = parseFloat($1);
+            obj.tipo = "float";
+            $$ = obj;
+        }
 ;
 
 main:
@@ -347,7 +396,7 @@ una_linea_c:
     |   CONTINUE PUNTOC
     |   CLEAR PAR_A PAR_C PUNTOC
     |   GETCH PAR_A PAR_C PUNTOC
-    |   SCANF PAR_A tipos_scan_c COMA IDENTIFICADORREF PAR_C
+    |   SCANF PAR_A tipos_scan_c COMA IDENTIFICADORREF PAR_C PUNTOC
         { console.log($3); }
     |   error PUNTOC
 ;
@@ -369,6 +418,23 @@ tipos_scan_c:
 
 expresion_c:
     expresion_c SUMA expresion_c
+        { 
+            var numero1 = soloNumeros($1);
+            var numero2 = soloNumeros($3);
+            var tipo1 = (numero1.tipo=="float" || numero2.tipo=="float")?"float":"int";
+            var obj = new Object();
+            obj.valor = numero1.valor+numero2.valor;
+            obj.tipo = tipo1;
+            yy.etiquetas++;
+            var etiqueta = "t"+yy.etiquetas;
+            var respuesta = tipo1+" "+etiqueta+" = "+numero1.etiqueta+" + "+numero2.etiqueta+"\n";
+            obj.respuesta = respuesta;
+            yy.codigo3D += respuesta;
+            obj.etiqueta = etiqueta;
+            $$ = obj;
+            console.log(obj);
+            console.log(yy.codigo3D);
+        }
     |   expresion_c POR expresion_c
     |   expresion_c ENTRE expresion_c
     |   expresion_c MOD expresion_c
@@ -384,6 +450,9 @@ expresion_c:
     |   PAR_A expresion_c PAR_C
     |   NOT expresion_c
     |   dato
+        { $$ = $1; $$.etiqueta = $$.valor; }
+    |   IDENTIFICADOR
+        { $$ = $1; }
 ;
 
 switch_c:
@@ -712,6 +781,7 @@ funciones_python:
 
 funcion_python:
     'def' IDENTIFICADOR '(' lista_parametros_python ')' ':' SALTO INDENT sentencias_python DEDENT
+    |   error DEDENT
     ;
 
 lista_parametros_python:

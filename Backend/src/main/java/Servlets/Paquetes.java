@@ -6,12 +6,15 @@
 package Servlets;
 
 import POJO.Archivo;
+import POJO.Directorio;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +25,7 @@ import org.apache.commons.io.IOUtils;
  *
  * @author willi
  */
-public class Texto extends HttpServlet {
+public class Paquetes extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,10 +44,10 @@ public class Texto extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet Texto</title>");
+            out.println("<title>Servlet Paquetes</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet Texto at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet Paquetes at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -63,38 +66,57 @@ public class Texto extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         File dir = new File("C:/Users/willi/OneDrive/Escritorio/Proyectos a2021s6/Organizacion de Lenguajes y Compiladores/ProyectosIDE");
-        File archivoPrueba = new File("C:/Users/willi/OneDrive/Escritorio/Proyectos a2021s6/Organizacion de Lenguajes y Compiladores/ProyectosIDE/Prueba/ArchivoPrueba.txt");
-        response.setContentType("text/plain");
+        response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        FileFilter logFilefilter = new FileFilter() {
-            //Override accept method
-            @Override
-            public boolean accept(File file) {
-                return file.getName().endsWith(".txt");
-            }
-        };
-        if (request.getParameter("archivo") == null) {
-            String todo = "";
-            File archivito = new File("C:/Users/willi/OneDrive/Escritorio/Proyectos a2021s6/Organizacion de Lenguajes y Compiladores/ProyectosIDE/Prueba/ArchivoPrueba.txt");
-            try (FileInputStream inputStream = new FileInputStream("C:/Users/willi/OneDrive/Escritorio/Proyectos a2021s6/Organizacion de Lenguajes y Compiladores/ProyectosIDE/Prueba/ArchivoPrueba.txt")) {
-                todo = IOUtils.toString(inputStream);
+        String existe = request.getParameter("existe");
+        if (existe != null) {
+            if (existe.equalsIgnoreCase("true")) {
+                System.out.println(dir.isDirectory() + "es directorio");
+                /*if (archivos == null || archivos.length == 0) {
+                    response.getWriter().write("no hay archivos");
+                } else {
+                    String todos = "";
+                    for (int i = 0; i < archivos.length; i++) {
+                        File archivo = archivos[i];
+                        todos += archivo.getName() + " directorio " + archivo.isDirectory();
+                    }
+                    obtener(archivos);
+                    response.getWriter().write(todos);
+                }*/
                 Gson gson = new Gson();
-                Archivo ar = new Archivo(todo, archivito.getName());
-                String json = gson.toJson(ar);
+                String json = gson.toJson(obtener(dir));
+                System.out.println(json);
                 response.getWriter().write(json);
+                //response.getWriter().write("{\"respuesta\":\"NOHAY\"}");
+            } else {
+                response.getWriter().write("{\"respuesta\":\"NOHAY\"}");
             }
         } else {
-            String archivo = request.getParameter("archivo");
-            String todo = "";
-            File archivito = new File("C:/Users/willi/OneDrive/Escritorio/Proyectos a2021s6/Organizacion de Lenguajes y Compiladores/" + archivo);
-            try (FileInputStream inputStream = new FileInputStream("C:/Users/willi/OneDrive/Escritorio/Proyectos a2021s6/Organizacion de Lenguajes y Compiladores/" + archivo)) {
-                todo = IOUtils.toString(inputStream);
-                Gson gson = new Gson();
-                Archivo ar = new Archivo(todo, archivito.getName());
-                String json = gson.toJson(ar);
-                response.getWriter().write(json);
+            response.getWriter().write("{\"respuesta\":\"ERROR\"}");
+        }
+    }
+
+    public Directorio obtener(File archivos) {
+        Directorio nuevo = new Directorio();
+        nuevo.setNombre(archivos.getName());
+        nuevo.setDirectorio(archivos.isDirectory());
+        List<Directorio> lis = new ArrayList<>();
+        String pa = archivos.getPath().replace('\\', '/');
+        String cortar = "C:/Users/willi/OneDrive/Escritorio/Proyectos a2021s6/Organizacion de Lenguajes y Compiladores/";
+        nuevo.setUrl(pa.substring(cortar.length(), pa.length()));
+        if (archivos.isDirectory()) {
+            File[] archs = archivos.listFiles();
+            if (archs == null || archs.length == 0) {
+                //no hace nada
+            } else {
+                for (int i = 0; i < archs.length; i++) {
+                    File ar = archs[i];
+                    lis.add(obtener(ar));
+                }
+                nuevo.setHijos(lis);
             }
         }
+        return nuevo;
     }
 
     /**
