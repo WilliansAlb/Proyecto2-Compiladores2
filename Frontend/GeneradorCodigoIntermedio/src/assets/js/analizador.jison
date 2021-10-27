@@ -1665,6 +1665,7 @@ clases:
 ;
 clase:
     'public' 'class' IDENTIFICADOR herencia '{' body_classp '}'
+    |   error '}'
 ;
 
 body_classp:
@@ -1896,6 +1897,7 @@ listado_java:
 
 constructorl:
     'public' IDENTIFICADOR '(' lista_parametros_java ')' '{' listado_java '}'
+    |   error '}'
 ;
 
 lista_parametros_java:
