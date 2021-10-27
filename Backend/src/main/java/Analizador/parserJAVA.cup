@@ -1,0 +1,577 @@
+package Analizador;
+import java_cup.runtime.Symbol;
+import java_cup.runtime.XMLElement;
+import Interpretes.InterpreteJAVA.*;
+import java.util.LinkedList;
+import java.util.List;
+
+parser code
+{:
+    public List<Expresion> lista_expresiones;
+    public Clases programa = new Clases();
+    public List<Metodo> lista_metodos = new LinkedList<>();
+    public List<Declaracion> lista_declaraciones = new LinkedList<>();
+
+    public void syntax_error(Symbol cur_token) {
+        String esperados = "";
+        for (int i = 0; i < expected_token_ids().size(); i++){
+            esperados += symbl_name_from_id(expected_token_ids().get(i))+"-";
+        }
+        imp(esperados);
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        System.out.println("reportfatal "+message+info);
+    }
+    
+    public void report_fatal_error(Symbol cur) {
+        System.out.println("unrecovered_syntax_error");
+    }
+
+    public void imp(String texto){
+        System.out.println(texto);
+    }
+
+:};
+
+terminal EXTENDS, INT, FLOAT, BOOLEAN, CHAR, STRING, BOOLEANV, CLASE, VOID,
+    IF, ELSE, SWITCH, CASE, BREAK, CONTINUE, DEFAULT, FOR, WHILE, DO, RETURN,
+    IGUAL, DIFF, MAYOR, MENOR, MAYOR_I, MENOR_I, NULO, AND, NAND, OR, XOR, NOR, NOT, SUMA, RESTA,
+    POR, ENTRE, MOD, POT, DEC, INC, SUMA_S, COR_A, COR_C, DOS_P, COMA, LLAVE_A, LLAVE_C,
+    ID, STRINGV, CHARV, PAR_A, PAR_C, INTV, FLOATV, ASIGNAR, ERRORLEX, UMINUS, PUNTOC, PUBLIC, PRIVATE;
+
+non terminal inicio, declaraciones, lista_declaracion, metodos_retorno, forma_ordenar, arreglo_cadena, arreglo_ordenar, incremento, decremento, suma_simplificada;
+non terminal Declaracion declaracion, declaracion_global;
+non terminal Metodo metodo;
+non terminal Expresion expresion, asignar, dimension;
+non terminal Instruccion instruccion, instruc;
+non terminal List<Expresion> dimensiones, param2, parametros2, expresiones;
+non terminal List<Instruccion> default,instrucciones, inst;
+non terminal Primitivo valor_puntual;
+non terminal List<String> ids, extiende;
+non terminal String tipo, id_llamada, tipo_uso;
+non terminal List<Case> casos;
+non terminal Case caso;
+non terminal If si;
+non terminal List<Expresion> parametros_enviar,param_enviar;
+non terminal ParametroEnviar parametro_enviar;
+non terminal Paso paso, cambio;
+non terminal Parametro parametro;
+non terminal List<Parametro> parametros, param;
+non terminal List<Clase> pistas;
+non terminal Clase pista;
+non terminal While mientras;
+non terminal Do hacer;
+non terminal For para;
+non terminal Llamada llamada;
+non terminal Switch switch;
+non terminal Asignacion asignacion;
+non terminal Asigna asigna;
+
+precedence left SUMA, RESTA;
+precedence left POR, ENTRE, MOD;
+precedence left POT;
+precedence right UMINUS;
+precedence left OR, NOR, XOR;
+precedence left AND, NAND;
+precedence right NOT;
+precedence left IGUAL, DIFF, MENOR, MENOR_I, MAYOR, MAYOR_I;
+
+start with inicio;
+
+inicio::=
+    pistas:e1
+        {:
+            programa = new Clases(e1);
+        :}
+;
+
+pistas::=
+    pistas:e1 pista:e2
+        {:
+            RESULT = e1;
+            RESULT.add(e2);
+        :}
+    |   pista:e1
+        {:
+            RESULT = new LinkedList<>();
+            RESULT.add(e1);
+        :}
+;
+
+pista::=
+    PUBLIC CLASE ID:e2 extiende:e3 LLAVE_A lista_declaracion LLAVE_C
+        {:
+            RESULT = new Clase(lista_metodos,lista_declaraciones,e3,e2.toString());
+            lista_metodos = new LinkedList<>();
+            lista_declaraciones = new LinkedList<>();
+        :}
+    |   error
+;
+
+extiende::=
+        {:
+            RESULT = null;
+        :}
+    |   EXTENDS ids:e1
+        {:
+            RESULT = e1;
+        :}
+;
+
+ids::=
+    ids:e1 COMA ID:e2 
+        {: 
+            e1.add(e2.toString()); 
+            RESULT = e1;
+        :}
+    |   ID:e1 
+        {: 
+            RESULT = new LinkedList<>();
+            RESULT.add(e1.toString()); 
+        :}
+;
+
+lista_declaracion::=
+    lista_declaracion declaraciones
+    |   declaraciones
+;
+
+declaraciones::=
+    declaracion_global:e1
+        {:
+            lista_declaraciones.add(e1);
+        :}
+|   metodo:e1
+        {:
+            lista_metodos.add(e1);
+        :}
+;
+
+metodo::=
+    tipo_uso:e5 tipo:e1 ID:e2 PAR_A param:e3 PAR_C LLAVE_A instrucciones:e4 LLAVE_C
+        {:
+            RESULT = new Metodo(e1.toString(),e2.toString(),e3,e4,true,e5.toString());
+        :}
+|   tipo_uso:e5 ID:e2 PAR_A param:e3 PAR_C LLAVE_A instrucciones:e4 LLAVE_C
+        {:
+            RESULT = new Metodo("constructor",e2.toString(),e3,e4,true,e5.toString());
+        :}
+;
+
+param::=
+        {:
+            RESULT = null;
+        :}
+|   parametros:e1
+        {:
+            RESULT = e1;
+        :}
+;
+
+parametros::=
+    parametros:e1 COMA tipo:e3 ID:e2
+        {:
+            RESULT = e1;
+            RESULT.add(new Parametro(e2.toString(),e3));
+        :}
+|   tipo:e1 ID:e2
+        {:
+            RESULT = new LinkedList<>();
+            RESULT.add(new Parametro(e2.toString(),e1));
+        :}
+; 
+
+instrucciones::=
+    instrucciones:e1 instruccion:e2
+        {:
+            RESULT = e1;
+            RESULT.add(e2);
+        :}
+|   instruccion:e1
+        {:
+            RESULT = new LinkedList<>();
+            RESULT.add(e1);
+        :}
+;
+
+instruccion::=
+   declaracion:e1
+        {:
+            RESULT = e1;
+        :}
+|   paso:e1
+        {:
+            RESULT = e1;
+        :}   
+|   para:e1
+        {:
+            RESULT = e1;
+        :}   
+|   asignacion:e1
+        {:
+            RESULT = e1;
+        :}   
+|   RETURN:e2 expresion:e1 PUNTOC
+        {:
+            RESULT = new Return(e1);
+        :}
+|   si:e1
+        {:
+            RESULT = e1;
+        :}
+|   hacer:e1
+        {:
+            RESULT = e1;
+        :}
+|   mientras:e1
+        {:
+            RESULT = e1;
+        :}
+|   llamada:e1 PUNTOC
+        {:
+            RESULT = e1;
+        :}
+|   switch:e1
+        {:
+            RESULT = e1;
+        :}
+|   error
+        {:
+            RESULT = null;
+        :}
+;
+
+para::=
+    FOR:e5 PAR_A asigna:e1 PUNTOC expresion:e2 PUNTOC paso:e3 PAR_C LLAVE_A inst:e4 LLAVE_C
+        {:
+            RESULT = new For(e1, e2, e3, e4);
+        :}
+;
+
+paso::=
+    ID:e1 INC
+        {:
+            RESULT = new Paso(e1.toString(),null,Paso.TIPO.INCREMENTO);
+        :}
+|   ID:e1 DEC
+        {:
+            RESULT = new Paso(e1.toString(),null,Paso.TIPO.DECREMENTO);
+        :}
+|   ID:e1 SUMA_S expresion:e2
+        {:
+            RESULT = new Paso(e1.toString(),e2,Paso.TIPO.SIMPLIFICADA);
+        :}
+;
+
+asigna::=
+    INT ID:e1 ASIGNAR expresion:e2
+        {:
+            RESULT = new Asigna(e1.toString(), e2);
+        :}
+|   ID:e1 ASIGNAR expresion:e2
+        {:
+            RESULT = new Asigna(e1.toString(), e2);
+        :}
+;
+
+inst::=
+    inst:e1 instruc:e2
+    {:
+        RESULT = e1;
+        RESULT.add(e2);
+    :}
+|   instruc:e1
+    {:
+        RESULT = new LinkedList<>();
+        RESULT.add(e1);
+    :}
+;
+
+llamada::=
+    ID:e1 PAR_A param_enviar:e2 PAR_C
+        {:
+            RESULT = new Llamada(e1.toString(),e2);
+        :}
+;
+
+param_enviar::=
+    {:
+        RESULT = null;
+    :}
+|   parametros_enviar:e1
+    {:
+        RESULT = e1;
+    :}
+;
+
+parametros_enviar::=
+    parametros_enviar:e1 COMA expresion:e2
+        {:
+            RESULT = e1;
+            RESULT.add(e2);
+        :}
+|   expresion:e1
+        {:
+            RESULT = new LinkedList<>();
+            RESULT.add(e1);
+        :}
+;
+
+instruc::=
+    instruccion:e1
+    {:
+        RESULT = e1;
+    :}
+|   BREAK:e1 PUNTOC
+    {:
+        RESULT = new CB(false);
+    :}
+|   CONTINUE:e1 PUNTOC
+    {:
+        RESULT = new CB(true);
+    :}
+;
+
+
+declaracion::=
+    tipo:e1 ids:e2 asignar:e3 PUNTOC
+        {:
+            RESULT = new Declaracion(e2, e1, e3, null);
+        :}
+;
+
+declaracion_global::=
+    tipo_uso:e4 tipo:e1 ids:e2 asignar:e3 PUNTOC
+        {:
+            RESULT = new Declaracion(e2, e1, e3, e4);
+        :}
+;
+
+tipo_uso::=
+    PUBLIC:e1
+        {:
+            RESULT = e1.toString();
+        :}
+    | PRIVATE:e1
+        {:
+            RESULT = e1.toString();
+        :}    
+;
+
+asignar::=
+        {:
+            RESULT = null;
+        :}
+|   ASIGNAR expresion:e1 
+        {: 
+            RESULT = e1; 
+        :}
+;
+
+tipo::=
+    INT
+        {:
+            RESULT = "int";
+        :}
+|   FLOAT
+        {:
+            RESULT = "float";
+        :}
+|   STRING
+        {:
+            RESULT = "string";
+        :}
+|   BOOLEAN
+        {:
+            RESULT = "boolean";
+        :}
+|   CHAR
+        {:
+            RESULT = "char";
+        :}
+;
+
+valor_puntual::=
+    INTV:e1 
+        {:
+            RESULT = new Primitivo("int",e1right,e1left,Integer.parseInt(e1.toString())); 
+        :}
+|   STRINGV:e1 
+        {: 
+            RESULT = new Primitivo("string",e1right,e1left,e1.toString()); 
+        :}
+|   CHARV:e1 
+        {: 
+            RESULT = new Primitivo("char",e1right,e1left,e1.toString().charAt(0)); 
+        :}
+|   BOOLEAN:e1 
+        {: 
+            RESULT = new Primitivo("boolean",e1right,e1left,true);
+        :}
+|   FLOATV:e1 
+        {: 
+            RESULT = new Primitivo("float",e1right,e1left,Double.parseDouble(e1.toString())); 
+        :}
+;
+
+expresion::=
+   expresion:e1 SUMA expresion:e2 
+        {: 
+            RESULT = new Expresion(e1,e2,"+");
+        :}
+|   expresion:e1 RESTA expresion:e2 {:
+            RESULT = new Expresion(e1,e2,"-");
+        :}
+|   expresion:e1 POR expresion:e2 {: 
+            RESULT = new Expresion(e1,e2,"*");
+        :}
+|   expresion:e1 ENTRE expresion:e2
+        {: 
+            RESULT = new Expresion(e1,e2,"/");
+        :}
+|   expresion:e1 POT expresion:e2
+        {: 
+            RESULT = new Expresion(e1,e2,"^");
+        :}
+|   expresion:e1 MOD expresion:e2 
+        {: 
+            RESULT = new Expresion(e1,e2,"%");
+        :}
+|   RESTA expresion:e1 
+        {: 
+            RESULT = new Expresion(e1,"menos");
+        :}
+%prec UMINUS
+|   expresion:e1 MAYOR expresion:e2
+        {: 
+            RESULT = new Expresion(e1,e2,">");
+        :}
+|   expresion:e1 MENOR expresion:e2 
+        {: 
+            RESULT = new Expresion(e1,e2,"<");
+        :}
+|   expresion:e1 MENOR_I expresion:e2 
+        {: 
+            RESULT = new Expresion(e1,e2,"<=");
+        :}
+|   expresion:e1 MAYOR_I expresion:e2 
+        {: 
+            RESULT = new Expresion(e1,e2,">=");
+        :}
+|   expresion:e1 IGUAL expresion:e2 
+        {: 
+            RESULT = new Expresion(e1,e2,"==");
+        :}
+|   expresion:e1 DIFF expresion:e2 
+        {: 
+            RESULT = new Expresion(e1,e2,"!=");
+        :}
+|   expresion:e1 AND expresion:e2
+        {: 
+            RESULT = new Expresion(e1,e2,"&&");
+        :}
+|   expresion:e1 OR expresion:e2 
+        {: 
+            RESULT = new Expresion(e1,e2,"||");
+        :}
+|   valor_puntual:e1 
+        {: 
+            RESULT = new Expresion(e1,"valor");
+        :}
+|   PAR_A expresion:e1 PAR_C
+        {: 
+            RESULT = e1;
+        :}
+|   ID:e1
+        {: 
+            RESULT = new Expresion(new Identificador(e1.toString()),"id");
+        :}
+|   NOT expresion:e1 
+        {: 
+            RESULT = new Expresion(e1,"!");
+        :}
+|   llamada:e1 
+        {: 
+            RESULT = new Expresion(new Retorno(e1),"llamada");
+        :}
+;
+
+si::=
+    IF:e5 PAR_A expresion:e1 PAR_C LLAVE_A inst:e2 LLAVE_C
+        {:
+            RESULT = new If(e1, e2, null, null);
+        :}
+|   IF:e5 PAR_A expresion:e1 PAR_C LLAVE_A inst:e2 LLAVE_C ELSE LLAVE_A inst:e3 LLAVE_C
+        {:
+            RESULT = new If(e1, e2, e3, null);
+        :}
+|   IF:e5 PAR_A expresion:e1 PAR_C LLAVE_A inst:e2 LLAVE_C ELSE si:e3
+        {:
+            RESULT = new If(e1, e2, null, e3);
+        :}
+;
+
+asignacion::=
+    ID:e1 ASIGNAR expresion:e2 PUNTOC
+        {: 
+            RESULT = new Asignacion(e1.toString(),e2);
+        :}
+;
+
+hacer::=
+    DO:e1 LLAVE_A inst:e3 LLAVE_C WHILE PAR_A expresion:e2 PAR_C PUNTOC
+        {:
+            RESULT = new Do(e2, e3);
+        :}
+;
+
+mientras::=
+    WHILE:e1 PAR_A expresion:e2 PAR_C LLAVE_A inst:e3 LLAVE_C
+        {:
+            RESULT = new While(e2, e3);
+        :}
+;
+
+switch::=
+    SWITCH:e1 PAR_A ID:e2 PAR_C LLAVE_A casos:e3 LLAVE_C
+        {:
+            RESULT = new Switch(e2.toString(), e3, null);
+        :}
+|   SWITCH:e1 PAR_A ID:e2 PAR_C LLAVE_A casos:e4 default:e3 LLAVE_C
+        {:
+            RESULT = new Switch(e2.toString(), e4, e3);
+        :}
+|   SWITCH:e1 PAR_A ID:e2 PAR_C LLAVE_A default:e3 LLAVE_C
+        {:
+            RESULT = new Switch(e2.toString(), null, e3);
+        :}
+;
+
+casos::=
+    casos:e1 caso:e2
+        {:
+            RESULT = e1;
+            RESULT.add(e2);
+        :}
+|   caso:e1
+        {:
+            RESULT = new LinkedList<>();
+            RESULT.add(e1);
+        :}
+;
+
+caso::=
+    CASE:e1 valor_puntual:e3 DOS_P inst:e2
+        {:
+            RESULT = new Case(e3, e2);
+        :}
+;
+
+default::=
+    DEFAULT DOS_P inst:e1
+        {:
+            RESULT = e1;
+        :}
+;
+

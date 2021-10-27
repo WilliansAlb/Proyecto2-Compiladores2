@@ -6,6 +6,7 @@ import { expresion_java } from 'src/assets/ts/expresion';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { if_java } from 'src/assets/ts/if';
 import { valor } from 'src/assets/ts/valor';
+import { Cuadrupla } from 'src/assets/ts/cuadrupla';
 declare var $: any;
 declare var analizador: any;
 
@@ -20,6 +21,7 @@ export class AppComponent implements OnInit {
 	lis_errores = [];
 	error_actual = 0;
 	lis_proyectos = [];
+	bloques_mov = [];
 	constructor(private elRef: ElementRef, private http: HttpClient) { }
 	ngOnInit() {
 		fetch("http://localhost:4200/api/Paquetes?existe=true", {
@@ -340,6 +342,7 @@ export class AppComponent implements OnInit {
 				i.classList.add("seleccionado");
 				var div_padre: any = i.parentNode;
 				div_padre.classList.add("seleccionado-contenedor");
+				document.getElementById("area-generado").style.display = "";
 				break;
 			case 2:
 				var i: any = document.querySelector("#cop");
@@ -393,8 +396,8 @@ export class AppComponent implements OnInit {
 				//extraerHijos(data.hijos[i],cont);
 			}
 			this.lis_proyectos = nose;
-			var dvc:any = document.querySelectorAll(".loader")[0];
-			setTimeout(()=>{
+			var dvc: any = document.querySelectorAll(".loader")[0];
+			setTimeout(() => {
 				dvc.style.display = "none";
 				for (var i = 0; i < nose.length; i++) {
 					var span = document.createElement("span");
@@ -426,8 +429,8 @@ export class AppComponent implements OnInit {
 					document.getElementById("oculto").style.display = "none";
 				};
 				ele.appendChild(spanto);
-			},500);
-			
+			}, 500);
+
 		});
 	}
 
@@ -441,6 +444,7 @@ export class AppComponent implements OnInit {
 			analizador.yy.expresion_java = expresion_java;
 			analizador.yy.valor_java = valor;
 			analizador.yy.asignacion_java = asignacion_java;
+			analizador.yy.Cuadrupla = Cuadrupla;
 			analizador.yy.errores = [];
 			analizador.yy.conteo = 0;
 			var h = analizador.parse(texto1.value);
@@ -455,41 +459,162 @@ export class AppComponent implements OnInit {
 				this.colocarErrores(texto1.value, nuevo_errores);
 				this.rellenarTabla();
 			}
+			if (h.codigo3D != "") {
+				//this.colocarErrores1(h.codigo3D);
+			}
+			this.imgClick(1);
+			this.colocarCuadruplas(h.C);
 		}
 	}
-	colocarErrores1(texto: String, errores: any) {
-		var texta: any = document.getElementById("area-editor");
-		var repe: any = document.getElementById("area-errores");
+	colocarErrores1(texto: String) {
+		var texta: any = document.getElementById("area-generado");
+		var ocultaar = document.getElementById("area-editor");
+		ocultaar.style.display = "none";
+		var repe: any = document.getElementById("lista-generado-c");
 		repe.style.display = "flex";
 		repe.style.flexDirection = "column";
 		repe.style.overflow = "auto";
-		repe.style.height = "88%";
-		texta.style.display = "none";
+		repe.style.height = "470px";
+		texta.style.display = "block";
 		repe.style.display = "flex";
+		repe.innerHTML = "";
 		var split = texto.split("\n");
-		var conteo_errores = 0;
 		for (var i = 0; i < split.length; i++) {
-			var div = document.createElement("div");
-			var acabados = true;
-			var inicio_linea = 0;
-			while (acabados && conteo_errores < errores.length) {
-				if ((i + 1) == errores[conteo_errores].linea) {
-					var cols = errores[conteo_errores].columna.split('-');
-					div.innerHTML += split[i].substring(inicio_linea, parseInt(cols[0]));
-					var razon = errores[conteo_errores].razon.replaceAll("'", "");
-					div.innerHTML += "<span class='error' style='color:red;font-size:2em;' title='" + razon + "'>" + split[i].substring(parseInt(cols[0]), parseInt(cols[1])) + "</span>";
-					inicio_linea = cols[1];
-					conteo_errores++;
-				} else {
-					acabados = false;
-				}
-			}
-			if (split[i].length > inicio_linea) {
-				div.innerHTML += split[i].substring(inicio_linea, split[i].length);
-			}
+			var div: any = document.createElement("div");
+			div.style.display = "grid";
+			div.style.gridTemplateColumns = "5% 95%";
+			div.classList.add("linea");
+			var numero: any = document.createElement("div");
+			var textoin: any = document.createElement("div");
+			numero.innerHTML = i + 1;
+			div.tabIndex = -1;
+			div.id = "lineaC" + (i + 1);
+			numero.style.borderRight = "2px solid white";
+			numero.style.textAlign = "center";
+			textoin.style.paddingLeft = "0.5em";
+			textoin.style.whiteSpace = "break-spaces";
+			textoin.textContent = split[i];
+			div.appendChild(numero);
+			div.appendChild(textoin);
 			repe.appendChild(div);
 		}
 	}
+
+	colocarCuadruplas(C: any) {
+		console.log(C);
+		var texta: any = document.getElementById("area-generado");
+		var ocultaar = document.getElementById("area-editor");
+		ocultaar.style.display = "none";
+		var repe: any = document.getElementById("lista-generado-c");
+		repe.style.display = "flex";
+		repe.style.flexDirection = "column";
+		repe.style.overflow = "auto";
+		repe.style.height = "77%";
+		texta.style.display = "block";
+		repe.style.display = "flex";
+		repe.innerHTML = "";
+		var split = "#include <stdio.h>\nstruct dato {\n\tint intv;\n\tchar charv;\n\tfloat floatv;\n};\nstruct dato stack[100];\nstruct dato heap[100];\nvoid main(){\n";
+		if (C.constantes != null) {
+			for (var i = 0; i < C.constantes.length; i++) {
+				split+="\t"+this.retornarString(C.constantes[i],C.tablaSimbolos);
+			}
+		}
+		if (C.globales != null) {
+			for (var i = 0; i < C.globales.length; i++) {
+				split+=this.retornarString(C.globales[i],C.tablaSimbolos);
+			}
+		}
+		if (C.cuadruplasMain != null) {
+			for (var i = 0; i < C.cuadruplasMain.length; i++) {
+				split+=this.retornarString(C.cuadruplasMain[i],C.tablaSimbolos);
+			}
+		}
+		split+="}";
+		console.log(split);
+		var splis = split.split("\n");
+		for (var i = 0; i < splis.length; i++) {
+			var div: any = document.createElement("div");
+			div.style.display = "grid";
+			div.style.gridTemplateColumns = "5% 95%";
+			div.classList.add("linea");
+			var numero: any = document.createElement("div");
+			var textoin: any = document.createElement("div");
+			numero.innerHTML = i + 1;
+			div.tabIndex = -1;
+			div.id = "lineaC" + (i + 1);
+			numero.style.borderRight = "2px solid white";
+			numero.style.textAlign = "center";
+			textoin.style.paddingLeft = "0.5em";
+			textoin.style.whiteSpace = "break-spaces";
+			textoin.textContent = splis[i];
+			div.appendChild(numero);
+			div.appendChild(textoin);
+			repe.appendChild(div);
+		}
+	}
+
+	retornarTab(){
+		var tab = "";
+		for (var i = 0; i < this.bloques_mov.length; i++){
+			tab += "\t";
+		}
+		return tab;
+	}
+
+	removeItemFromArr (item:any ) {
+		var i = this.bloques_mov.indexOf( item );
+	 
+		if ( i !== -1 ) {
+			this.bloques_mov.splice( i, 1 );
+		} else {
+			this.bloques_mov.push(item);
+		}
+	}
+
+	retornarString(obj: any,sim:any) {
+		console.log(sim);
+		var operacion2 = ["+","-",">","<","||","&&","==","!=","*","%",">=","<="];
+		if (operacion2.includes(obj.operacion)){
+			return this.retornarTab()+obj.resultado+" = "+obj.argumento1+" "+obj.operacion+" "+obj.argumento2+";\n";
+		} else if (obj.operacion=='!' || obj.operacion=='negativo') {
+			var res = (obj.operacion=='negativo')?'-':'!';
+			return this.retornarTab()+obj.resultado+" = "+res+""+obj.argumento1+";\n";
+		} else if (obj.operacion=="bloque"){
+			this.removeItemFromArr(obj.argumento1);
+			return "";
+		} else if (obj.operacion=="goto"){
+			return this.retornarTab()+"goto "+obj.argumento1+";\n";
+		} else if (obj.operacion=="etiqueta"){
+			return this.retornarTab()+obj.argumento1+":\n";
+		} else if (obj.operacion.toLowerCase()=="iffalse"){
+			return this.retornarTab()+"if (!"+obj.argumento1+") goto "+obj.argumento2+";\n";
+		} else if (obj.operacion.toLowerCase()=="if"){
+			return this.retornarTab()+"if ("+obj.argumento1+") goto "+obj.argumento2+";\n";
+		} else if (obj.operacion=="d="){
+			return this.retornarTab()+obj.resultado+" = "+obj.argumento1+";\n";
+		} else if (obj.operacion=="d=[]"){
+			return this.retornarTab()+obj.argumento1+" [ "+obj.argumento2+" ];\n";
+		} else if (obj.operacion=="e=[]"){
+			return this.retornarTab()+obj.resultado+" = "+obj.argumento1+"[ "+obj.argumento2+" ];\n";
+		} else if (obj.operacion=="="){
+			return this.retornarTab()+obj.resultado+" = "+obj.argumento1+";\n";
+		} else if (obj.operacion=="scanf"){
+			return this.retornarTab()+"scanf( \""+obj.argumento1+"\" , "+obj.argumento2+" );\n";
+		} else if (obj.operacion=="printf"){
+			if (obj.argumento2!=null){
+				return this.retornarTab()+"printf( \""+obj.argumento1+"\" , "+obj.argumento2+" );\n";
+			} else {
+				return this.retornarTab()+"printf( \""+obj.argumento1+"\" );\n";
+			}
+		} else if (obj.operacion=="getch"){
+			return this.retornarTab()+"getch();\n";
+		} else if (obj.operacion=="clear"){
+			return this.retornarTab()+"clrscr();\n";
+		} else {
+			return "";
+		}
+	}
+
 	colocarErrores(texto: String, errores: any) {
 		this.lis_errores = errores;
 		var texta: any = document.getElementById("area-editor");

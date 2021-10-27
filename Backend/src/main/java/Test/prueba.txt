@@ -1,0 +1,40 @@
+public class hola extends adios{
+	public int numero1;
+	public hola(int hola2){
+            int numero = 1;
+	}
+	private void numeros(){
+		String numero2 = "estoy probando nomas";
+		if (7>5)
+		{
+			int numero3 = "estoy probando nomas";
+			int numero2 = intinput();
+		} else if (10>11) {
+			boolean bool = "otra prueba mas";
+		} else {
+			int numeral = 'A';
+		}
+		for (int aleatorio = 1; aleatorio < 10; aleatorio++){
+			int numero4 = "$";
+		}
+		while (a>20){
+			int conteo = "no se que pedo";
+		}
+		do {
+			int conteo2 = 0.234;
+			conteo2 += 29+320;
+			conteo2 = 30;
+			conteo2++;
+			conteo2--;
+		} while ( 5>a32);
+		switch(prueba){
+			case 'C':
+				conteo++;
+			case 2:
+				conteo--;
+		}
+		println();
+		print(conteo);
+		return "algo";
+	}
+}
